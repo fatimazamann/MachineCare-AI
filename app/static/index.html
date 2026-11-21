@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MachineCare AI</title>
+<style>
+  :root { --bg:#f4f6f8; --card:#fff; --ink:#0f172a; --ink2:#475569; --line:#e2e8f0; --accent:#0e7490; --accent2:#155e75;
+          --red:#b91c1c; --amber:#b45309; --green:#15803d; --blue:#2563eb; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); font-size:14px; }
+  header { background:#0b2530; color:#fff; padding:14px 22px; display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+  header h1 { font-size:19px; margin:0; } header .sub { color:#9fd3df; font-size:12.5px; }
+  nav { display:flex; gap:4px; margin-left:auto; }
+  nav button { background:transparent; color:#cfe8ee; border:0; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:14px; }
+  nav button.active { background:#0e7490; color:#fff; }
+  main { max-width:1200px; margin:0 auto; padding:18px 16px 40px; }
+  .tab { display:none; } .tab.active { display:block; }
+  .grid { display:grid; grid-template-columns: 340px 1fr; gap:16px; }
+  @media (max-width: 860px) { .grid { grid-template-columns:1fr; } }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px; }
+  .card h2 { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink2); margin:0 0 12px; }
+  label { display:block; font-size:12.5px; color:var(--ink2); margin:10px 0 4px; }
+  input, select { width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:8px; font-size:14px; }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+  .btn { background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12.5px; }
+  .btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); width:100%; padding:10px; font-size:14px; margin-top:14px; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  svg text { font-size:11px; fill:#475569; } .legend span { display:inline-block; margin-right:14px; font-size:12.5px; } .sw { display:inline-block; width:12px; height:3px; vertical-align:middle; margin-right:5px; }
+  @media (max-width: 600px) { .kpis { grid-template-columns:1fr; } }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:12px; }
+  .kpi .k { font-size:12px; color:var(--ink2); } .kpi .v { font-size:24px; font-weight:700; margin-top:4px; }
+  .bar { height:8px; background:#eef2f6; border-radius:6px; overflow:hidden; margin-top:4px; }
+  .bar > div { height:100%; background:var(--accent); }
+  .row { display:grid; grid-template-columns:110px 1fr 56px; gap:8px; align-items:center; margin:6px 0; font-size:13px; }
+  .badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:600; }
+  .b-red { background:#fee2e2; color:var(--red); } .b-green { background:#dcfce7; color:var(--green); } .b-amber { background:#fef3c7; color:var(--amber); }
+  .b-blue { background:#dbeafe; color:var(--blue); }
+  pre { background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:10px; white-space:pre-wrap; font-size:12px; margin:0; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { border-bottom:1px solid var(--line); padding:7px 8px; text-align:left; }
+  th { background:#f1f5f9; font-weight:600; } th:not(:first-child) { text-align:right; } td.n { text-align:right; font-variant-numeric:tabular-nums; }
+  tr.best td { background:#ecfeff; font-weight:600; }
+  img.fig { max-width:100%; border:1px solid var(--line); border-radius:8px; background:#fff; }
+  .figs { display:grid; grid-template-columns:1fr 1fr; gap:16px; } @media (max-width: 860px) { .figs { grid-template-columns:1fr; } }
+  .note { color:var(--ink2); font-size:12.5px; line-height:1.5; }
+  ol { padding-left:20px; margin:6px 0; } li { margin:4px 0; }
+  .empty { color:var(--ink2); padding:30px; text-align:center; }
+</style>
+</head>
+<body>
+<header>
+  <div><h1>MachineCare AI</h1><div class="sub">Air-leak early warning for a metro train compressor · machine learning + expert system · MetroPT-3</div></div>
+  <nav>
+    <button class="active" data-tab="predict">Check readings</button>
+    <button data-tab="replay">Replay</button>
+    <button data-tab="models">Model results</button>
+    <button data-tab="data">Data</button>
+  </nav>
+</header>
+<main>
+  <section class="tab active" id="tab-predict">
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>Compressor readings (last 30 min)</h2>
+          <div class="presets" id="presets"></div>
+          <label>Loaded time (%) – normal ≈ 15 %</label><input id="duty_pct_30" type="number" step="1" min="0" max="100" value="12">
+          <label>Average motor current (A) – normal ≈ 2 A</label><input id="current_mean_a_30" type="number" step="0.1" value="1.8">
+          <label>Highest oil temperature (°C)</label><input id="oil_temp_c_max_30" type="number" step="0.1" value="66">
+          <label>Lowest panel pressure TP3 (bar) – cut-in 8.2</label><input id="panel_pressure_min_bar_30" type="number" step="0.01" value="8.3">
+          <label>Dryer discharge pressure DV (bar)</label><input id="dryer_dv_pressure_bar_30" type="number" step="0.01" value="0">
+          <label>Low-pressure alarm (LPS)</label><select id="lps_active"><option value="no">Not active</option><option value="yes">Active (below 7 bar)</option></select>
+          <label>Maintenance priority</label>
+          <select id="policy"><option value="balanced">Balanced</option><option value="safety_first">Safety first</option><option value="production_continuity">Service continuity</option></select>
+          <button class="btn primary" id="run">Check</button>
+        </div>
+      </div>
+      <div id="out"><div class="card empty">Enter readings (or pick an example) and press <b>Check</b>.</div></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-replay">
+    <div class="card"><h2>Replay real data</h2>
+      <div class="presets" id="episodes"></div>
+      <p class="note">Warnings come from leave-one-failure-out testing: the model shown for each failure never saw that failure during training. Red band = reported air leak (from 2 h before its start).</p>
+      <div id="chart"></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-models">
+    <div class="card"><h2>Test period: July–August (failure 4, never seen in training)</h2><div id="mtable"></div><p class="note" id="mnote"></p></div>
+    <div class="card"><h2>All four failures (leave-one-failure-out)</h2><div id="lofo"></div><p class="note" id="lnote"></p></div>
+    <div class="figs">
+      <div class="card"><h2>Model comparison</h2><img class="fig" src="/figures/fig_model_comparison.png" alt="Model comparison"></div>
+      <div class="card"><h2>Failure 4 close-up</h2><img class="fig" src="/figures/fig_test_failure.png" alt="Failure 4"></div>
+      <div class="card"><h2>Which features generalise?</h2><img class="fig" src="/figures/fig_ablation.png" alt="Ablation"></div>
+      <div class="card"><h2>Warnings over six months</h2><img class="fig" src="/figures/fig_lofo_timeline.png" alt="Timeline"></div>
+      <div class="card"><h2>Confusion matrix</h2><img class="fig" src="/figures/fig_confusion.png" alt="Confusion matrix"></div>
+      <div class="card"><h2>ROC and precision–recall</h2><img class="fig" src="/figures/fig_roc_pr.png" alt="ROC and PR curves"></div>
+      <div class="card"><h2>Feature importance</h2><img class="fig" src="/figures/fig_importance.png" alt="Feature importance"></div>
+      <div class="card"><h2>Robustness</h2><img class="fig" src="/figures/fig_robustness.png" alt="Robustness"></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-data">
+    <div class="card"><h2>Dataset</h2><div id="dq"></div></div>
+    <div class="card"><h2>Six months of data</h2><img class="fig" src="/figures/fig_timeline.png" alt="Timeline"></div>
+    <div class="card"><h2>Data problems and class balance</h2><img class="fig" src="/figures/fig_data.png" alt="Data problems"></div>
+  </section>
+</main>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const pct = (x) => (x * 100).toFixed(1) + "%";
+const F = ["duty_pct_30", "current_mean_a_30", "oil_temp_c_max_30", "panel_pressure_min_bar_30", "dryer_dv_pressure_bar_30", "lps_active"];
+const PRESETS = {
+  "Normal": [12, 1.8, 66, 8.3, 0, "no"],
+  "Early warning": [55, 3.8, 74, 8.2, 0.5, "no"],
+  "Leak at the dryer": [100, 5.5, 75, 8.1, 1.9, "no"],
+  "Leak downstream": [95, 5.4, 84, 7.8, 0, "no"],
+  "Low-pressure alarm": [100, 5.4, 86, 6.8, 0, "yes"],
+  "Hot oil (cooler)": [15, 2.0, 82, 8.3, 0, "no"],
+};
+$("#presets").innerHTML = Object.keys(PRESETS).map((k) => `<button class="btn" data-p="${esc(k)}">${esc(k)}</button>`).join("");
+document.querySelectorAll("[data-p]").forEach((b) => b.addEventListener("click", () => {
+  PRESETS[b.dataset.p].forEach((v, i) => ($("#" + F[i]).value = v)); run();
+}));
+document.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("nav button").forEach((x) => x.classList.toggle("active", x === b));
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.id === "tab-" + b.dataset.tab));
+}));
+$("#run").addEventListener("click", run);
+
+function meter(label, v, sub) {
+  const on = v >= 0.5;
+  return `<div class="kpi"><div class="k">${label}</div><div class="v" style="color:${on ? "var(--red)" : "var(--green)"}">${pct(Math.max(v, 0))}</div>
+    <div class="bar"><div style="width:${Math.max(v, 0) * 100}%;background:${on ? "var(--red)" : "var(--green)"}"></div></div><div class="note">${sub}</div></div>`;
+}
+
+async function run() {
+  const body = Object.fromEntries(F.map((f) => [f, $("#" + f).value]));
+  body.policy = $("#policy").value;
+  const r = await fetch("/api/predict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (!r.ok) { $("#out").innerHTML = `<div class="card">Error: ${esc(j.error)}</div>`; return; }
+  const ml = j.ml, kb = j.rules;
+  const urg = { IMMEDIATE: "b-red", URGENT: "b-amber", SCHEDULED: "b-blue", MONITOR: "b-green" }[kb.urgency] || "b-blue";
+  $("#out").innerHTML = `
+    <div class="card"><div class="kpis">
+      ${meter(`ML: leak probability (${esc(ml.model)})`, ml.leak_probability, `closest real minute: ${esc(ml.matched_minute)}`)}
+      ${meter("Expert system: leak certainty (CF)", kb.leak_cf, j.agreement ? '<span class="badge b-green">agrees with ML</span>' : '<span class="badge b-amber">disagrees with ML – check</span>')}
+      ${meter("Hybrid score (average)", j.hybrid.score, `verdict: <b>${esc(j.hybrid.prediction)}</b>`)}
+    </div></div>
+    ${kb.safety.length ? `<div class="card" style="border-color:#fca5a5;background:#fef2f2"><b style="color:var(--red)">Safety:</b> ${kb.safety.map((s) => esc(s.label)).join("; ")}</div>` : ""}
+    <div class="grid" style="grid-template-columns:1fr 1fr">
+      <div class="card"><h2>Expert-system diagnosis</h2>
+        ${kb.faults.map((f) => `<div class="row"><span>${esc(f.name)}</span><div class="bar"><div style="width:${Math.max(f.cf, 0) * 100}%;background:#b45309"></div></div><span class="n">${f.cf.toFixed(2)}</span></div>`).join("")}
+        ${kb.causes.length ? `<p class="note"><b>Likely cause:</b> ${kb.causes.map((c) => `${esc(c.name)} (CF ${c.cf.toFixed(2)})`).join("; ")}</p>` : ""}
+      </div>
+      <div class="card"><h2>Why? (rules that fired)</h2>
+        <p class="note">${esc(kb.summary)}</p>
+        ${kb.how.length ? `<pre>${esc(kb.how.join("\n"))}</pre>` : '<p class="note">No fault rule fired for these readings.</p>'}
+      </div>
+    </div>
+    <div class="card"><h2>Maintenance plan <span class="badge ${urg}">${esc(kb.urgency)}</span> <span class="note">${esc(kb.urgency_label)}</span></h2>
+      ${kb.plan.length ? `<ol>${kb.plan.map((s) => `<li><b>${esc(s.name)}</b> <span class="note">– ${esc(s.stage)}, ${esc(s.when)}</span></li>`).join("")}</ol>` : '<p class="note">No action needed – keep normal monitoring.</p>'}
+    </div>`;
+}
+
+function lineChart(d) {
+  const W = 1100, H = 300, L = 46, R = 12, T = 12, mid = 140, gap = 26;
+  const n = d.t.length, x = (i) => L + (i / Math.max(n - 1, 1)) * (W - L - R);
+  const y1 = (v) => T + (1 - v / 100) * (mid - T), y2 = (v) => mid + gap + (1 - v) * (H - mid - gap - 22);
+  const path = (arr, fy) => arr.map((v, i) => (v == null ? "" : `${i && arr[i - 1] != null ? "L" : "M"}${x(i).toFixed(1)},${fy(v).toFixed(1)}`)).join("");
+  let bands = "";
+  d.failure.forEach((v, i) => { if (v > 0.5) bands += `<rect x="${x(i)}" y="${T}" width="${(W - L - R) / n + 0.6}" height="${H - T - 22}" fill="#fecaca" opacity=".55"/>`; });
+  const ticks = [0, Math.floor(n / 4), Math.floor(n / 2), Math.floor(3 * n / 4), n - 1].map((i) => `<text x="${x(i)}" y="${H - 4}" text-anchor="middle">${esc(d.t[i])}</text>`).join("");
+  const duty = d.loaded_frac_30.map((v) => (v == null ? null : v * 100));
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Replay chart">${bands}
+    <line x1="${L}" x2="${W - R}" y1="${y2(0.5)}" y2="${y2(0.5)}" stroke="#94a3b8" stroke-dasharray="4 4"/>
+    <text x="4" y="${y1(100) + 8}">100%</text><text x="4" y="${y1(0)}">0%</text><text x="4" y="${y2(1) + 8}">1.0</text><text x="4" y="${y2(0.5) + 4}">0.5</text><text x="4" y="${y2(0)}">0</text>
+    <path d="${path(duty, y1)}" fill="none" stroke="#2563eb" stroke-width="1.6"/>
+    <path d="${path(d.rules, y2)}" fill="none" stroke="#15803d" stroke-width="1.6"/>
+    <path d="${path(d.ml, y2)}" fill="none" stroke="#b45309" stroke-width="1.6"/>
+    ${ticks}</svg>
+    <div class="legend"><span><i class="sw" style="background:#2563eb"></i>Compressor loaded time (top)</span><span><i class="sw" style="background:#b45309"></i>ML leak probability</span>
+    <span><i class="sw" style="background:#15803d"></i>Expert-system CF</span><span><i class="sw" style="background:#fecaca;height:10px"></i>Reported leak</span></div>`;
+}
+async function showEpisode(name) {
+  document.querySelectorAll("[data-e]").forEach((b) => (b.style.background = b.dataset.e === name ? "#cffafe" : "#fff"));
+  const d = await (await fetch("/api/replay?name=" + encodeURIComponent(name))).json();
+  $("#chart").innerHTML = lineChart(d);
+}
+(async function () {
+  const eps = await (await fetch("/api/episodes")).json();
+  $("#episodes").innerHTML = eps.map((e) => `<button class="btn" data-e="${esc(e)}">${esc(e)}</button>`).join("");
+  document.querySelectorAll("[data-e]").forEach((b) => b.addEventListener("click", () => showEpisode(b.dataset.e)));
+  showEpisode(eps[3]);
+})();
+
+(async function loadResults() {
+  const r = await (await fetch("/api/results")).json();
+  const f3 = (v) => (v == null ? "–" : v.toFixed(3));
+  $("#mtable").innerHTML = `<table><tr><th>Model</th><th>CV F1</th><th>Accuracy</th><th>Balanced acc.</th><th>Precision</th><th>Recall</th><th>F1</th><th>ROC-AUC</th><th>Caught / lead</th><th>False alarms</th></tr>
+    ${Object.entries(r.results).map(([n, m]) => { const ev = m.event.events[0] || {};
+      return `<tr class="${n === r.best_model ? "best" : ""}"><td>${esc(n)}</td><td class="n">${f3(m.cv_score)}</td><td class="n">${f3(m.accuracy)}</td><td class="n">${f3(m.balanced_accuracy)}</td>
+      <td class="n">${f3(m.precision)}</td><td class="n">${f3(m.recall)}</td><td class="n">${f3(m.f1)}</td><td class="n">${f3(m.roc_auc)}</td>
+      <td class="n">${ev.detected ? (ev.lead_min >= 0 ? `yes, ${ev.lead_min} min early` : `yes, ${-ev.lead_min} min late`) : "no"}</td><td class="n">${m.event.false_alarm_episodes}</td></tr>`; }).join("")}</table>`;
+  $("#mnote").innerHTML = `Highlighted: best model, chosen by leave-one-failure-out cross-validated F1 on February–June (never by the test score). Test: ${r.split.test_rows.toLocaleString()} minutes, of which ${r.split.test_failure_minutes} are leak minutes.
+    Accuracy is misleading – always saying “normal” already scores ${(1 - r.split.test_failure_minutes / r.split.test_rows).toFixed(3)} – so F1, balanced accuracy and caught failures are the main measures.
+    Early/late = first warning compared with the reported failure start. Probabilities pass a 15-minute averaging filter before the 0.5 threshold.`;
+  $("#lofo").innerHTML = `<table><tr><th>Approach</th><th>F1 per held-out failure</th><th>Overall F1</th><th>Recall</th><th>Caught</th><th>Lead (min)</th><th>False-alarm episodes</th></tr>
+    ${Object.entries(r.lofo).map(([k, v]) => `<tr><td>${esc({ ml: r.best_model, rules: "Expert system", hybrid: "Hybrid" }[k])}</td><td class="n">${v.per_failure_f1.map((x) => x.toFixed(2)).join(" · ")}</td>
+      <td class="n">${f3(v.overall.f1)}</td><td class="n">${f3(v.overall.recall)}</td><td class="n">${v.event.detected}/${v.event.total}</td><td class="n">${v.event.events.map((e) => e.lead_min).join(" · ")}</td>
+      <td class="n">${v.event.false_alarm_episodes} (${v.event.false_alarms_within_6_weeks_before_a_failure} before a failure)</td></tr>`).join("")}</table>`;
+  $("#lnote").innerHTML = `Each failure is held out in turn and the model is trained on the other three. Most “false alarms” happen in the six weeks before a reported failure and look exactly like a leak – very likely the same leak growing before anyone reported it.`;
+  const q = r.data;
+  $("#dq").innerHTML = `<p class="note"><b>MetroPT-3</b> (UCI, Davari, Veloso, Ribeiro & Gama): ${q.rows.toLocaleString()} raw sensor readings from the air compressor of a Metro do Porto train, ${esc(q.start)} to ${esc(q.end)}, 15 signals.
+    The file has <b>no failure column</b> – labels were built from the company's failure reports (4 air leaks). Problems found: ${q.gaps_over_1min} gaps (${q.missing_hours} h missing, longest ${q.longest_gap_h} h),
+    irregular time steps (8–22 s), the documentation says 1 Hz but the file has one reading every ~10 s, ${(q.frozen_minutes_removed / 60).toFixed(0)} hours of frozen sensors, negative pressure offsets,
+    a duplicated signal (TP3 and Reservoirs, correlation ${q.tp3_reservoirs_corr}), an Oil_level signal that is "low" ${q.oil_level_active_pct}% of the time, and a shifted repair column in the failure report.
+    After cleaning: ${q.minute_rows.toLocaleString()} one-minute rows, ${q.positive_minutes.toLocaleString()} labelled as leak (${pct(q.positive_minutes / q.minute_rows)}). No personal data is involved.</p>`;
+})();
+</script>
+</body>
+</html>
