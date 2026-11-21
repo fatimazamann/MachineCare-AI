@@ -1,0 +1,923 @@
+# =====================================================================
+#  IEFD-KBS  –  Production-rule base with MYCIN certainty factors
+# ---------------------------------------------------------------------
+#  Syntax
+#    RULE <id>
+#      TYPE     safety | diagnostic | cause
+#      DOMAIN   <ontology class>[, <class> …]   (rule applies to that class
+#                                               and all of its subclasses)
+#      IF       <condition> [AND <condition> …]
+#      AND      <condition>                      (continuation line)
+#      THEN     <fact> CF <-1.0 … 1.0>
+#      SOURCE   <source ids from sources.json>
+#      NOTE     <explanation shown to the user>
+#    END
+#  Conditions:  fact | NOT fact | ANY(fact, fact, …)
+#  Conclusions: fault:<id> | cause:<id> | safety:<constraint>
+#  Premise CF  = min over AND-ed conditions, max inside ANY(),
+#                NOT f has CF = −CF(f).  A rule fires when premise CF > 0.2.
+#  Conclusion contribution = rule CF × premise CF, combined with other
+#  evidence by the MYCIN parallel-combination function.
+#  A negative rule CF (e.g. −0.70) is evidence AGAINST the conclusion.
+# =====================================================================
+
+
+# ---------------------------------------------------------------------
+#  SAFETY RULES  (fired first; they create hard constraints for the
+#  maintenance recommender)
+# ---------------------------------------------------------------------
+RULE S-01
+  TYPE safety
+  DOMAIN RotatingMachine
+  IF vibration_severe
+  THEN safety:immediate_stop CF 0.9
+  SOURCE S-ISO10816
+  NOTE Vibration in ISO 10816-3 Zone D is considered severe enough to cause damage.
+END
+
+RULE S-02
+  TYPE safety
+  DOMAIN RotatingMachine
+  IF bearing_temp_critical
+  THEN safety:immediate_stop CF 0.85
+  SOURCE S-EXPERT
+  NOTE Bearing temperature at trip level – risk of seizure and shaft damage.
+END
+
+RULE S-03
+  TYPE safety
+  DOMAIN InductionMotor
+  IF fault:single_phasing
+  THEN safety:immediate_stop CF 0.95
+  SOURCE S-ECM
+  NOTE A single-phased motor must be switched off at once; the winding overheats within minutes.
+END
+
+RULE S-04
+  TYPE safety
+  DOMAIN InductionMotor
+  IF burning_smell
+  THEN safety:immediate_stop CF 0.9
+  SOURCE S-EXPERT
+  NOTE Burning insulation is a fire and electrical hazard.
+END
+
+RULE S-05
+  TYPE safety
+  DOMAIN InductionMotor
+  IF winding_temp_critical
+  THEN safety:immediate_stop CF 0.85
+  SOURCE S-PS
+  NOTE Winding at/above its insulation-class limit; every 10 °C over rating halves insulation life.
+END
+
+RULE S-06
+  TYPE safety
+  DOMAIN InductionMotor
+  IF voltage_unbalance_severe
+  THEN safety:immediate_stop CF 0.8
+  SOURCE S-NEMA, S-PS
+  NOTE NEMA MG 1 advises against operating above 5 % voltage unbalance.
+END
+
+RULE S-07
+  TYPE safety
+  DOMAIN CentrifugalPump
+  IF fault:seal_failure
+  AND hazardous_fluid
+  THEN safety:hazard_containment CF 0.9
+  SOURCE S-EXPERT
+  NOTE A leaking seal on a flammable/toxic liquid is a process-safety event.
+END
+
+
+# ---------------------------------------------------------------------
+#  ROTATING MACHINERY  (inherited by pumps and motors)
+# ---------------------------------------------------------------------
+RULE R-UNB-1
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF spec_1x_radial
+  AND high_vibration
+  AND NOT high_axial_vibration
+  THEN fault:unbalance CF 0.8
+  SOURCE S-FLUKE
+  NOTE Elevated 1× radial vibration without a strong axial component is the classic unbalance signature.
+END
+
+RULE R-UNB-2
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF spec_1x_radial
+  THEN fault:unbalance CF 0.4
+  SOURCE S-FLUKE
+  NOTE A dominant 1× radial peak alone suggests unbalance.
+END
+
+RULE R-UNB-3
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF rotor_deposits
+  AND high_vibration
+  THEN fault:unbalance CF 0.6
+  SOURCE S-ECM
+  NOTE Deposits/erosion on rotating parts change the mass distribution.
+END
+
+RULE R-UNB-4
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF NOT high_vibration
+  THEN fault:unbalance CF -0.6
+  SOURCE S-EXPERT
+  NOTE Normal vibration level is evidence against unbalance.
+END
+
+RULE R-MIS-1
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF spec_2x_axial
+  AND high_axial_vibration
+  THEN fault:misalignment CF 0.85
+  SOURCE S-FLUKE
+  NOTE 1×/2× peaks with high axial vibration indicate shaft misalignment.
+END
+
+RULE R-MIS-2
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF high_axial_vibration
+  AND high_vibration
+  THEN fault:misalignment CF 0.5
+  SOURCE S-FLUKE
+  NOTE High axial vibration is characteristic of misalignment.
+END
+
+RULE R-MIS-3
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF recent_reassembly
+  AND high_vibration
+  THEN fault:misalignment CF 0.45
+  SOURCE S-ECM
+  NOTE Vibration that appears after re-installation often comes from poor alignment.
+END
+
+RULE R-MIS-4
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF NOT high_vibration
+  THEN fault:misalignment CF -0.5
+  SOURCE S-EXPERT
+  NOTE Normal vibration level is evidence against misalignment.
+END
+
+RULE R-BRG-1
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF spec_bearing_freq
+  THEN fault:bearing_defect CF 0.8
+  SOURCE S-FLUKE
+  NOTE Non-synchronous peaks at bearing defect frequencies point to race/element damage.
+END
+
+RULE R-BRG-2
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF bearing_noise
+  AND bearing_overheating
+  THEN fault:bearing_defect CF 0.7
+  SOURCE S-ECM
+  NOTE A noisy, hot bearing is damaged.
+END
+
+RULE R-BRG-3
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF bearing_noise
+  THEN fault:bearing_defect CF 0.45
+  SOURCE S-ECM
+  NOTE Noisy rolling-element bearings are usually damaged.
+END
+
+RULE R-BRG-4
+  TYPE diagnostic
+  DOMAIN RotatingMachine
+  IF bearing_overheating
+  AND high_vibration
+  THEN fault:bearing_defect CF 0.4
+  SOURCE S-PSG
+  NOTE Hot bearing plus high vibration suggests bearing distress.
+END
+
+
+# ---------------------------------------------------------------------
+#  CENTRIFUGAL PUMP
+# ---------------------------------------------------------------------
+RULE R-CAV-1
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF crackling_noise
+  AND npsh_margin_low
+  THEN fault:cavitation CF 0.9
+  SOURCE S-PSG, S-HI961
+  NOTE Crackling noise together with inadequate NPSH margin is the definitive cavitation pattern.
+END
+
+RULE R-CAV-2
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF crackling_noise
+  AND ANY(suction_level_low, fluid_temp_high, suction_strainer_blocked)
+  THEN fault:cavitation CF 0.75
+  SOURCE S-PSG
+  NOTE Crackling noise with a known suction-side restriction or hot liquid indicates cavitation.
+END
+
+RULE R-CAV-3
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF crackling_noise
+  THEN fault:cavitation CF 0.5
+  SOURCE S-PSG
+  NOTE 'Gravel' noise is typical of collapsing vapour bubbles.
+END
+
+RULE R-CAV-4
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF npsh_margin_low
+  THEN fault:cavitation CF 0.55
+  SOURCE S-HI961
+  NOTE NPSHa close to NPSH3 means the pump is at or near cavitation.
+END
+
+RULE R-CAV-5
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF NOT npsh_margin_low
+  THEN fault:cavitation CF -0.4
+  SOURCE S-HI961
+  NOTE A measured adequate NPSH margin is evidence against classic cavitation.
+END
+
+RULE R-BLK-1
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF low_flow
+  AND solids_in_fluid
+  AND low_power_draw
+  THEN fault:impeller_blockage CF 0.8
+  SOURCE S-PSG
+  NOTE Reduced flow and power with solids in the liquid indicates a clogged impeller.
+END
+
+RULE R-BLK-2
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF suction_strainer_blocked
+  AND low_flow
+  THEN fault:impeller_blockage CF 0.6
+  SOURCE S-PSG
+  NOTE An obstruction in the suction line reduces delivered flow.
+END
+
+RULE R-BLK-3
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF no_flow
+  AND solids_in_fluid
+  THEN fault:impeller_blockage CF 0.7
+  SOURCE S-PSG
+  NOTE No delivery while pumping solids suggests a fully clogged impeller.
+END
+
+RULE R-WEAR-1
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF low_flow
+  AND low_head
+  AND impeller_long_service
+  THEN fault:impeller_wear CF 0.75
+  SOURCE S-PSG
+  NOTE Gradual loss of flow and head after long service indicates worn impeller/wear rings.
+END
+
+RULE R-WEAR-2
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF impeller_long_service
+  AND solids_in_fluid
+  AND low_head
+  THEN fault:impeller_wear CF 0.7
+  SOURCE S-PSG
+  NOTE Abrasive duty accelerates clearance wear.
+END
+
+RULE R-WEAR-3
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF low_head
+  AND NOT crackling_noise
+  AND NOT pressure_fluctuation
+  THEN fault:impeller_wear CF 0.4
+  SOURCE S-EXPERT
+  NOTE A steady (quiet, stable) head deficit is typical of internal wear rather than cavitation/air.
+END
+
+RULE R-SEAL-1
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF seal_leakage
+  AND ANY(dry_run_event, seal_flush_problem)
+  THEN fault:seal_failure CF 0.9
+  SOURCE S-PSG
+  NOTE Seal leakage after dry running or loss of flush confirms seal face damage.
+END
+
+RULE R-SEAL-2
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF seal_leakage
+  THEN fault:seal_failure CF 0.7
+  SOURCE S-PSG
+  NOTE Visible leakage at the seal indicates a worn mechanical seal.
+END
+
+RULE R-SEAL-3
+  TYPE diagnostic
+  DOMAIN CentrifugalPump
+  IF NOT seal_leakage
+  THEN fault:seal_failure CF -0.7
+  SOURCE S-EXPERT
+  NOTE No leakage is strong evidence against seal failure.
+END
+
+
+# ---------------------------------------------------------------------
+#  THREE-PHASE INDUCTION MOTOR
+# ---------------------------------------------------------------------
+RULE R-SP-1
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF phase_loss
+  THEN fault:single_phasing CF 0.95
+  SOURCE S-ECM
+  NOTE One phase current/voltage is missing.
+END
+
+RULE R-SP-2
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF hums_no_start
+  AND trips_overload
+  THEN fault:single_phasing CF 0.7
+  SOURCE S-ECM
+  NOTE Power present, no rotation, humming and tripping – likely single-phasing.
+END
+
+RULE R-SP-3
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF hums_no_start
+  THEN fault:single_phasing CF 0.55
+  SOURCE S-ECM
+  NOTE A motor that hums without turning is likely single-phased (check the load is free).
+END
+
+RULE R-SP-4
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF current_unbalance
+  AND motor_overheating
+  AND trips_overload
+  THEN fault:single_phasing CF 0.4
+  SOURCE S-EXPERT
+  NOTE Strong current unbalance with overheating and tripping can come from a lost phase under load.
+END
+
+RULE R-SP-5
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF NOT phase_loss
+  THEN fault:single_phasing CF -0.8
+  SOURCE S-EXPERT
+  NOTE All three phases measured present.
+END
+
+RULE R-VU-1
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF voltage_unbalance
+  AND current_unbalance
+  THEN fault:voltage_unbalance_fault CF 0.85
+  SOURCE S-NEMA, S-PS
+  NOTE Voltage unbalance amplified 6–10× in current unbalance confirms a supply-unbalance problem.
+END
+
+RULE R-VU-2
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF voltage_unbalance
+  THEN fault:voltage_unbalance_fault CF 0.6
+  SOURCE S-NEMA
+  NOTE Line-voltage unbalance above 1 % requires derating (NEMA MG 1).
+END
+
+RULE R-VU-3
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF voltage_unbalance
+  AND motor_overheating
+  THEN fault:voltage_unbalance_fault CF 0.6
+  SOURCE S-PS
+  NOTE Unbalance adds negative-sequence heating.
+END
+
+RULE R-VU-4
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF NOT voltage_unbalance
+  THEN fault:voltage_unbalance_fault CF -0.7
+  SOURCE S-EXPERT
+  NOTE Balanced measured line voltages rule out supply unbalance.
+END
+
+RULE R-OL-1
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF motor_overloaded
+  AND NOT current_unbalance
+  THEN fault:motor_overload CF 0.8
+  SOURCE S-ECM
+  NOTE Balanced current above FLA indicates mechanical overload.
+END
+
+RULE R-OL-2
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF motor_overloaded
+  AND ANY(load_jam, speed_low)
+  THEN fault:motor_overload CF 0.75
+  SOURCE S-ECM
+  NOTE Over-current with a binding load or low speed confirms overload.
+END
+
+RULE R-OL-3
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF trips_overload
+  AND motor_overheating
+  AND NOT voltage_unbalance
+  THEN fault:motor_overload CF 0.5
+  SOURCE S-ECM
+  NOTE Tripping and overheating on a balanced supply suggest overload.
+END
+
+RULE R-OL-4
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF NOT motor_overloaded
+  THEN fault:motor_overload CF -0.7
+  SOURCE S-EXPERT
+  NOTE Current below FLA rules out sustained overload.
+END
+
+RULE R-BRB-1
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF rotor_sidebands
+  THEN fault:broken_rotor_bars CF 0.85
+  SOURCE S-FAB-BRB
+  NOTE (1±2s)f current sidebands above −45 dB indicate broken bars.
+END
+
+RULE R-BRB-2
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF current_pulsation
+  AND ANY(slow_acceleration, speed_low)
+  THEN fault:broken_rotor_bars CF 0.7
+  SOURCE S-ECM
+  NOTE Pulsating current with weak acceleration/low speed indicates loss of rotor torque.
+END
+
+RULE R-BRB-3
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF current_pulsation
+  THEN fault:broken_rotor_bars CF 0.45
+  SOURCE S-EXPERT
+  NOTE A rhythmically beating ammeter suggests a rotor asymmetry.
+END
+
+RULE R-BRB-4
+  TYPE diagnostic
+  DOMAIN InductionMotor
+  IF NOT rotor_sidebands
+  THEN fault:broken_rotor_bars CF -0.7
+  SOURCE S-FAB-BRB
+  NOTE Sidebands below −54 dB indicate a healthy cage.
+END
+
+
+# ---------------------------------------------------------------------
+#  CNC MILLING MACHINE  (AI4I 2020 failure-mode knowledge)
+# ---------------------------------------------------------------------
+RULE R-HDF-1
+  TYPE diagnostic
+  DOMAIN CNCMillingMachine
+  IF low_temp_difference
+  AND low_spindle_speed
+  THEN fault:heat_dissipation_failure CF 0.95
+  SOURCE S-AI4I, S-MATZKA
+  NOTE ΔT < 8.6 K and speed < 1380 rpm – heat cannot be dissipated.
+END
+
+RULE R-HDF-2
+  TYPE diagnostic
+  DOMAIN CNCMillingMachine
+  IF low_temp_difference
+  THEN fault:heat_dissipation_failure CF 0.25
+  SOURCE S-AI4I
+  NOTE Early warning: low ΔT alone (speed still adequate).
+END
+
+RULE R-PWF-1
+  TYPE diagnostic
+  DOMAIN CNCMillingMachine
+  IF power_out_of_range
+  THEN fault:power_failure CF 0.95
+  SOURCE S-AI4I, S-MATZKA
+  NOTE Power outside 3500–9000 W.
+END
+
+RULE R-PWF-2
+  TYPE diagnostic
+  DOMAIN CNCMillingMachine
+  IF power_near_limit
+  THEN fault:power_failure CF 0.3
+  SOURCE S-AI4I
+  NOTE Early warning: power within 5 % of a limit.
+END
+
+RULE R-OSF-1
+  TYPE diagnostic
+  DOMAIN CNCMillingMachine
+  IF overstrain
+  THEN fault:overstrain_failure CF 0.95
+  SOURCE S-AI4I, S-MATZKA
+  NOTE Tool wear × torque above the variant limit.
+END
+
+RULE R-OSF-2
+  TYPE diagnostic
+  DOMAIN CNCMillingMachine
+  IF overstrain_approaching
+  THEN fault:overstrain_failure CF 0.35
+  SOURCE S-AI4I
+  NOTE Early warning: within 10 % of the overstrain limit.
+END
+
+RULE R-TWF-1
+  TYPE diagnostic
+  DOMAIN CNCMillingMachine
+  IF tool_wear_critical
+  THEN fault:tool_wear_failure CF 0.45
+  SOURCE S-AI4I, S-MATZKA
+  NOTE In the 200–240 min window the tool may fail at any time (random failure time).
+END
+
+RULE R-TWF-2
+  TYPE diagnostic
+  DOMAIN CNCMillingMachine
+  IF tool_wear_critical
+  AND ANY(poor_surface_finish, cutting_noise_changed)
+  THEN fault:tool_wear_failure CF 0.75
+  SOURCE S-EXPERT
+  NOTE Worn tool with deteriorating finish or chatter.
+END
+
+
+# ---------------------------------------------------------------------
+#  TRAIN AIR COMPRESSOR / AIR PRODUCTION UNIT  (MetroPT-3 knowledge)
+# ---------------------------------------------------------------------
+RULE S-APU-1
+  TYPE safety
+  DOMAIN AirCompressor
+  IF low_pressure_alarm
+  THEN safety:withdraw_from_service CF 0.95
+  SOURCE S-METROPT3
+  NOTE Below 7 bar the brakes, doors and suspension may not get enough air.
+END
+
+RULE R-ALK-1
+  TYPE diagnostic
+  DOMAIN AirCompressor
+  IF continuous_loading
+  AND high_motor_load
+  THEN fault:air_leak CF 0.85
+  SOURCE S-METROPT3, S-VELOSO2022
+  NOTE The compressor works almost non-stop at full current to replace escaping air.
+END
+
+RULE R-ALK-2
+  TYPE diagnostic
+  DOMAIN AirCompressor
+  IF continuous_loading
+  AND panel_pressure_low
+  THEN fault:air_leak CF 0.9
+  SOURCE S-METROPT3
+  NOTE Even with non-stop loading the panel pressure drops below the 8.2 bar cut-in level.
+END
+
+RULE R-ALK-3
+  TYPE diagnostic
+  DOMAIN AirCompressor
+  IF continuous_loading
+  THEN fault:air_leak CF 0.5
+  SOURCE S-EXPERT
+  NOTE Unusually long loading alone is early evidence of a leak (normal duty is about 15 %).
+END
+
+RULE R-ALK-4
+  TYPE diagnostic
+  DOMAIN AirCompressor
+  IF hissing_heard
+  AND continuous_loading
+  THEN fault:air_leak CF 0.95
+  SOURCE S-EXPERT
+  NOTE An audible leak plus long loading confirms the diagnosis.
+END
+
+RULE R-ALK-5
+  TYPE diagnostic
+  DOMAIN AirCompressor
+  IF NOT continuous_loading
+  THEN fault:air_leak CF -0.6
+  SOURCE S-EXPERT
+  NOTE Normal duty cycle is evidence against a significant leak.
+END
+
+RULE R-ALK-6
+  TYPE diagnostic
+  DOMAIN AirCompressor
+  IF oil_temp_high
+  AND continuous_loading
+  THEN fault:air_leak CF 0.3
+  SOURCE S-VELOSO2022
+  NOTE Hot oil caused by the extra running time supports the leak diagnosis.
+END
+
+RULE R-OVH-1
+  TYPE diagnostic
+  DOMAIN AirCompressor
+  IF oil_temp_high
+  AND NOT continuous_loading
+  THEN fault:compressor_overheating CF 0.8
+  SOURCE S-EXPERT
+  NOTE Hot oil without extra running time points to the oil cooler or the oil.
+END
+
+RULE R-OVH-2
+  TYPE diagnostic
+  DOMAIN AirCompressor
+  IF oil_temp_high
+  THEN fault:compressor_overheating CF 0.3
+  SOURCE S-EXPERT
+  NOTE Early warning: oil above its normal range.
+END
+
+RULE C-ALK-1
+  TYPE cause
+  DOMAIN AirCompressor
+  IF fault:air_leak
+  AND ANY(dryer_purge_high, dryer_leak_observed)
+  THEN cause:dryer_valve_leak CF 0.75
+  SOURCE S-VELOSO2022, S-EXPERT
+  NOTE High dryer discharge pressure while loaded means air is lost through the dryer (failures 1–3).
+END
+
+RULE C-ALK-2
+  TYPE cause
+  DOMAIN AirCompressor
+  IF fault:air_leak
+  AND NOT dryer_purge_high
+  THEN cause:downstream_pipe_leak CF 0.6
+  SOURCE S-VELOSO2022, S-EXPERT
+  NOTE Dryer looks normal, so the air is lost further downstream (failure 4).
+END
+
+# ---------------------------------------------------------------------
+#  ROOT-CAUSE RULES  (fault + discriminating evidence → cause)
+# ---------------------------------------------------------------------
+RULE C-UNB-1
+  TYPE cause
+  DOMAIN RotatingMachine
+  IF fault:unbalance
+  AND rotor_deposits
+  THEN cause:deposit_buildup CF 0.8
+  SOURCE S-ECM
+END
+
+RULE C-MIS-1
+  TYPE cause
+  DOMAIN RotatingMachine
+  IF fault:misalignment
+  AND recent_reassembly
+  THEN cause:improper_alignment CF 0.8
+  SOURCE S-ECM
+END
+
+RULE C-MIS-2
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:misalignment
+  AND pipe_strain
+  THEN cause:pipe_strain CF 0.8
+  SOURCE S-PSG
+END
+
+RULE C-BRG-1
+  TYPE cause
+  DOMAIN RotatingMachine
+  IF fault:bearing_defect
+  AND ANY(grease_degraded, relube_overdue)
+  THEN cause:inadequate_lubrication CF 0.75
+  SOURCE S-ECM
+END
+
+RULE C-BRG-2
+  TYPE cause
+  DOMAIN RotatingMachine
+  IF fault:bearing_defect
+  AND NOT grease_degraded
+  AND NOT relube_overdue
+  THEN cause:fatigue_end_of_life CF 0.4
+  SOURCE S-EXPERT
+END
+
+RULE C-CAV-1
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:cavitation
+  AND suction_level_low
+  THEN cause:low_suction_head CF 0.85
+  SOURCE S-PSG
+END
+
+RULE C-CAV-2
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:cavitation
+  AND fluid_temp_high
+  THEN cause:high_vapour_pressure CF 0.8
+  SOURCE S-HI961
+END
+
+RULE C-CAV-3
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:cavitation
+  AND suction_strainer_blocked
+  THEN cause:suction_restriction CF 0.85
+  SOURCE S-PSG
+END
+
+RULE C-BLK-1
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:impeller_blockage
+  AND solids_in_fluid
+  THEN cause:solids_ingestion CF 0.85
+  SOURCE S-PSG
+END
+
+RULE C-BLK-2
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:impeller_blockage
+  AND suction_strainer_blocked
+  THEN cause:suction_restriction CF 0.8
+  SOURCE S-PSG
+END
+
+RULE C-WEAR-1
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:impeller_wear
+  AND solids_in_fluid
+  THEN cause:abrasive_wear CF 0.8
+  SOURCE S-PSG
+END
+
+RULE C-WEAR-2
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:impeller_wear
+  AND impeller_long_service
+  THEN cause:normal_wear_out CF 0.7
+  SOURCE S-PSG
+END
+
+RULE C-SEAL-1
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:seal_failure
+  AND dry_run_event
+  THEN cause:dry_running CF 0.85
+  SOURCE S-PSG
+END
+
+RULE C-SEAL-2
+  TYPE cause
+  DOMAIN CentrifugalPump
+  IF fault:seal_failure
+  AND seal_flush_problem
+  THEN cause:seal_flush_failure CF 0.85
+  SOURCE S-PSG
+END
+
+RULE C-SP-1
+  TYPE cause
+  DOMAIN InductionMotor
+  IF fault:single_phasing
+  THEN cause:open_phase CF 0.85
+  SOURCE S-ECM
+END
+
+RULE C-VU-1
+  TYPE cause
+  DOMAIN InductionMotor
+  IF fault:voltage_unbalance_fault
+  THEN cause:supply_unbalance CF 0.7
+  SOURCE S-PS
+END
+
+RULE C-OL-1
+  TYPE cause
+  DOMAIN InductionMotor
+  IF fault:motor_overload
+  AND load_jam
+  THEN cause:driven_load_binding CF 0.85
+  SOURCE S-ECM
+END
+
+RULE C-OL-2
+  TYPE cause
+  DOMAIN InductionMotor
+  IF fault:motor_overload
+  AND supply_voltage_low
+  THEN cause:low_supply_voltage CF 0.7
+  SOURCE S-ECM
+END
+
+RULE C-BRB-1
+  TYPE cause
+  DOMAIN InductionMotor
+  IF fault:broken_rotor_bars
+  AND frequent_starts
+  THEN cause:frequent_starting CF 0.8
+  SOURCE S-EXPERT
+END
+
+RULE C-BRB-2
+  TYPE cause
+  DOMAIN InductionMotor
+  IF fault:broken_rotor_bars
+  AND ANY(load_jam, slow_acceleration)
+  THEN cause:high_inertia_starting CF 0.55
+  SOURCE S-EXPERT
+END
+
+RULE C-HDF-1
+  TYPE cause
+  DOMAIN CNCMillingMachine
+  IF fault:heat_dissipation_failure
+  THEN cause:insufficient_cooling_low_speed CF 0.9
+  SOURCE S-AI4I
+END
+
+RULE C-PWF-1
+  TYPE cause
+  DOMAIN CNCMillingMachine
+  IF fault:power_failure
+  THEN cause:improper_cutting_parameters CF 0.8
+  SOURCE S-AI4I
+END
+
+RULE C-OSF-1
+  TYPE cause
+  DOMAIN CNCMillingMachine
+  IF fault:overstrain_failure
+  THEN cause:worn_tool_high_torque CF 0.85
+  SOURCE S-AI4I
+END
+
+RULE C-TWF-1
+  TYPE cause
+  DOMAIN CNCMillingMachine
+  IF fault:tool_wear_failure
+  THEN cause:tool_beyond_life CF 0.85
+  SOURCE S-AI4I
+END
