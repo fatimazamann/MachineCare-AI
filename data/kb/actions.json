@@ -1,0 +1,629 @@
+{
+  "meta": {
+    "description": "Maintenance action frames. downtime_h = typical outage while the action is performed; cost = relative cost level 1 (very low) … 5 (very high) incl. parts and labour; safety_gain = how much the action reduces immediate risk to people/equipment (0–1). Values are knowledge-engineer estimates (see report §4.5 Assumptions) and can be refined from CMMS history.",
+    "types": [
+      "containment",
+      "inspection",
+      "corrective",
+      "preventive",
+      "operational",
+      "monitoring"
+    ]
+  },
+  "actions": {
+    "stop_loto": {
+      "name": "Stop the machine and apply lockout/tagout (LOTO)",
+      "type": "containment",
+      "requires_shutdown": true,
+      "downtime_h": 0.5,
+      "cost": 1,
+      "safety_gain": 1.0,
+      "steps": [
+        "Stop the machine from the local station",
+        "Isolate and lock all energy sources (electrical, pressure, stored energy)",
+        "Verify zero energy before any work"
+      ]
+    },
+    "switch_to_standby": {
+      "name": "Transfer duty to the standby unit",
+      "type": "containment",
+      "requires_shutdown": false,
+      "downtime_h": 0.2,
+      "cost": 1,
+      "safety_gain": 0.6,
+      "requires_standby": true,
+      "steps": [
+        "Start and prove the standby unit",
+        "Transfer the duty",
+        "Isolate the faulty unit for maintenance"
+      ]
+    },
+    "reduce_load": {
+      "name": "Reduce load/speed and run under close watch",
+      "type": "operational",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.3,
+      "steps": [
+        "Reduce throughput/load to the minimum acceptable",
+        "Assign an operator to monitor temperature, noise and vibration every hour"
+      ]
+    },
+    "increase_monitoring": {
+      "name": "Increase condition-monitoring frequency (trend vibration/temperature)",
+      "type": "monitoring",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.2,
+      "steps": [
+        "Raise route frequency (e.g. weekly → daily)",
+        "Set alarm limits on the trend",
+        "Re-run diagnosis when the trend changes"
+      ]
+    },
+    "vibration_analysis": {
+      "name": "Detailed vibration analysis (spectrum, phase, axial readings)",
+      "type": "inspection",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 2,
+      "safety_gain": 0.1,
+      "steps": [
+        "Take radial and axial spectra at each bearing",
+        "Compare 1×/2×/harmonic/bearing-frequency content and phase"
+      ]
+    },
+    "clean_rotor": {
+      "name": "Clean deposits from impeller/fan/rotor",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 3,
+      "cost": 1,
+      "safety_gain": 0.2,
+      "steps": [
+        "Isolate (LOTO)",
+        "Remove and clean deposits",
+        "Re-check vibration"
+      ]
+    },
+    "field_balance": {
+      "name": "Dynamic (field) balancing of the rotor",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 4,
+      "cost": 3,
+      "safety_gain": 0.3,
+      "steps": [
+        "Isolate (LOTO)",
+        "Single/two-plane trial-weight balancing",
+        "Verify residual 1× amplitude"
+      ]
+    },
+    "laser_alignment": {
+      "name": "Laser shaft alignment to tolerance",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 3,
+      "cost": 2,
+      "safety_gain": 0.3,
+      "steps": [
+        "Isolate (LOTO)",
+        "Check and correct soft foot",
+        "Align with a laser tool to the coupling tolerance",
+        "Record as-left values"
+      ]
+    },
+    "check_pipe_strain": {
+      "name": "Check and relieve pipe strain; support piping",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 4,
+      "cost": 2,
+      "safety_gain": 0.2,
+      "steps": [
+        "Unbolt flanges and check they stay aligned",
+        "Add/adjust pipe supports"
+      ]
+    },
+    "fix_soft_foot": {
+      "name": "Correct soft foot and re-torque hold-down bolts",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 2,
+      "cost": 1,
+      "safety_gain": 0.3,
+      "steps": [
+        "Check each foot with a dial gauge",
+        "Shim and torque bolts to specification",
+        "Repair cracked grout/baseplate if found"
+      ]
+    },
+    "replace_bearing": {
+      "name": "Replace the bearing (clean installation, correct fits)",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 6,
+      "cost": 3,
+      "safety_gain": 0.5,
+      "steps": [
+        "Isolate (LOTO)",
+        "Remove bearing; keep it for failure analysis",
+        "Check shaft/housing fits",
+        "Install and lubricate correctly",
+        "Run-in and verify vibration/temperature"
+      ]
+    },
+    "relubricate": {
+      "name": "Relubricate with the correct grease and quantity",
+      "type": "corrective",
+      "requires_shutdown": false,
+      "downtime_h": 0.5,
+      "cost": 1,
+      "safety_gain": 0.2,
+      "steps": [
+        "Confirm grease type and quantity",
+        "Grease with drain plug open",
+        "Monitor temperature for 1 h"
+      ]
+    },
+    "lube_schedule": {
+      "name": "Correct the relubrication schedule/quantity in the CMMS",
+      "type": "preventive",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.1,
+      "steps": [
+        "Recalculate interval and quantity",
+        "Update the PM work order"
+      ]
+    },
+    "insulated_bearings": {
+      "name": "Install insulated bearing / shaft-grounding ring (VFD motors)",
+      "type": "preventive",
+      "requires_shutdown": true,
+      "downtime_h": 6,
+      "cost": 3,
+      "safety_gain": 0.2,
+      "steps": [
+        "Fit an insulated NDE bearing or a shaft-grounding ring",
+        "Verify shaft voltage"
+      ]
+    },
+    "restore_npsha": {
+      "name": "Restore NPSH available (raise suction level, open suction valve, clean strainer, cool liquid)",
+      "type": "corrective",
+      "requires_shutdown": false,
+      "downtime_h": 0.5,
+      "cost": 1,
+      "safety_gain": 0.3,
+      "steps": [
+        "Raise the suction vessel level / open the suction valve fully",
+        "Clean the suction strainer",
+        "Reduce liquid temperature if possible",
+        "Re-check NPSHa against NPSH3"
+      ]
+    },
+    "operate_near_bep": {
+      "name": "Move the operating point towards BEP (valve/VFD/impeller trim)",
+      "type": "operational",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.3,
+      "steps": [
+        "Adjust discharge valve or VFD speed to bring flow to 70–120 % of BEP",
+        "Review system curve if not achievable"
+      ]
+    },
+    "inspect_impeller": {
+      "name": "Open the pump and inspect impeller/wear rings",
+      "type": "inspection",
+      "requires_shutdown": true,
+      "downtime_h": 4,
+      "cost": 2,
+      "safety_gain": 0.1,
+      "steps": [
+        "Isolate and drain",
+        "Inspect for cavitation pitting, erosion, wear-ring clearance"
+      ]
+    },
+    "suction_redesign": {
+      "name": "Engineering review of suction system (NPSH margin)",
+      "type": "preventive",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 3,
+      "safety_gain": 0.2,
+      "steps": [
+        "Recalculate NPSHa",
+        "Consider larger suction line, raised tank, booster or lower-NPSH pump"
+      ]
+    },
+    "dry_run_protection": {
+      "name": "Install dry-run protection (level switch / power monitor)",
+      "type": "preventive",
+      "requires_shutdown": false,
+      "downtime_h": 1,
+      "cost": 2,
+      "safety_gain": 0.3,
+      "steps": [
+        "Install low-level or under-power trip",
+        "Test trip function"
+      ]
+    },
+    "clear_impeller": {
+      "name": "Open the pump and clear impeller/suction obstruction",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 4,
+      "cost": 2,
+      "safety_gain": 0.2,
+      "steps": [
+        "Isolate (LOTO) and drain",
+        "Remove debris from impeller and suction",
+        "Reassemble, prime and test"
+      ]
+    },
+    "install_strainer": {
+      "name": "Install/upgrade suction strainer and cleaning routine",
+      "type": "preventive",
+      "requires_shutdown": true,
+      "downtime_h": 3,
+      "cost": 2,
+      "safety_gain": 0.1,
+      "steps": [
+        "Fit a strainer with ΔP gauge",
+        "Add strainer cleaning to PM"
+      ]
+    },
+    "replace_wear_parts": {
+      "name": "Restore clearances: replace wear rings / impeller",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 8,
+      "cost": 4,
+      "safety_gain": 0.1,
+      "steps": [
+        "Isolate (LOTO)",
+        "Measure clearances",
+        "Replace wear rings/impeller",
+        "Performance test"
+      ]
+    },
+    "contain_leak": {
+      "name": "Contain leakage and isolate hazardous liquid (spill procedure)",
+      "type": "containment",
+      "requires_shutdown": false,
+      "downtime_h": 0.5,
+      "cost": 1,
+      "safety_gain": 0.9,
+      "steps": [
+        "Barricade area and remove ignition sources",
+        "Place drip tray/absorbent",
+        "Follow site spill/permit procedure"
+      ]
+    },
+    "replace_mech_seal": {
+      "name": "Replace mechanical seal",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 6,
+      "cost": 3,
+      "safety_gain": 0.6,
+      "steps": [
+        "Isolate (LOTO), drain and flush",
+        "Replace seal; check shaft sleeve and run-out",
+        "Restore flush plan",
+        "Leak test"
+      ]
+    },
+    "restore_seal_flush": {
+      "name": "Restore seal flush / cooling plan",
+      "type": "corrective",
+      "requires_shutdown": false,
+      "downtime_h": 1,
+      "cost": 1,
+      "safety_gain": 0.3,
+      "steps": [
+        "Clear the flush line/orifice",
+        "Verify flow and pressure to the seal chamber"
+      ]
+    },
+    "correct_supply_balance": {
+      "name": "Correct supply voltage unbalance (loads, taps, connections)",
+      "type": "corrective",
+      "requires_shutdown": false,
+      "downtime_h": 1,
+      "cost": 2,
+      "safety_gain": 0.4,
+      "steps": [
+        "Measure line voltages at the motor and the MCC",
+        "Redistribute single-phase loads, check transformer taps and tighten connections",
+        "Derate the motor until unbalance ≤ 1 %"
+      ]
+    },
+    "phase_protection": {
+      "name": "Install phase-loss / unbalance protection relay",
+      "type": "preventive",
+      "requires_shutdown": true,
+      "downtime_h": 2,
+      "cost": 2,
+      "safety_gain": 0.4,
+      "steps": [
+        "Fit a phase-failure/unbalance relay",
+        "Set trip at the agreed unbalance limit",
+        "Test"
+      ]
+    },
+    "repair_open_phase": {
+      "name": "Find and repair the open phase (fuses, contactor poles, terminals)",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 1,
+      "cost": 1,
+      "safety_gain": 0.6,
+      "steps": [
+        "Isolate (LOTO)",
+        "Check fuses, contactor contacts, overload relay and terminals",
+        "Replace faulty part; check all three line voltages before restart"
+      ]
+    },
+    "insulation_test": {
+      "name": "Insulation tests (IR, PI, surge) before re-energising",
+      "type": "inspection",
+      "requires_shutdown": true,
+      "downtime_h": 2,
+      "cost": 1,
+      "safety_gain": 0.5,
+      "steps": [
+        "Isolate and discharge",
+        "Measure IR(1 min) and PI (IEEE 43)",
+        "Surge/turn-to-turn test if available"
+      ]
+    },
+    "mcsa_confirm": {
+      "name": "Confirm with motor-current signature analysis (MCSA)",
+      "type": "inspection",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 2,
+      "safety_gain": 0.1,
+      "steps": [
+        "Record current spectrum at > 70 % load",
+        "Measure (1±2s)f sideband level"
+      ]
+    },
+    "repair_rotor": {
+      "name": "Repair or replace the rotor cage",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 48,
+      "cost": 5,
+      "safety_gain": 0.6,
+      "steps": [
+        "Install spare motor if available",
+        "Send rotor for repair/replacement"
+      ]
+    },
+    "soft_start": {
+      "name": "Limit starts/hour; fit soft starter or VFD",
+      "type": "preventive",
+      "requires_shutdown": true,
+      "downtime_h": 4,
+      "cost": 3,
+      "safety_gain": 0.2,
+      "steps": [
+        "Review start frequency against motor data",
+        "Fit soft starter/VFD for high-inertia loads"
+      ]
+    },
+    "reduce_mech_load": {
+      "name": "Remove the cause of overload (binding, jam, excess load)",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 2,
+      "cost": 1,
+      "safety_gain": 0.4,
+      "steps": [
+        "Uncouple and turn by hand to check binding",
+        "Clear jams; verify load against motor rating"
+      ]
+    },
+    "resize_motor": {
+      "name": "Re-rate/resize motor for the actual load",
+      "type": "preventive",
+      "requires_shutdown": true,
+      "downtime_h": 8,
+      "cost": 4,
+      "safety_gain": 0.3,
+      "steps": [
+        "Calculate actual power demand",
+        "Select motor with adequate output and service factor"
+      ]
+    },
+    "replace_tool": {
+      "name": "Replace the cutting tool",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 0.25,
+      "cost": 1,
+      "safety_gain": 0.3,
+      "steps": [
+        "Stop spindle",
+        "Replace tool and reset wear counter"
+      ]
+    },
+    "tool_change_policy": {
+      "name": "Preventive tool change before 200 min of wear",
+      "type": "preventive",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.2,
+      "steps": [
+        "Set tool-life limit in the CNC tool table"
+      ]
+    },
+    "increase_speed_cooling": {
+      "name": "Increase spindle speed / improve process cooling",
+      "type": "operational",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.3,
+      "steps": [
+        "Raise speed above 1380 rpm where the process allows",
+        "Check coolant flow and temperature"
+      ]
+    },
+    "check_coolant": {
+      "name": "Check coolant/ventilation system",
+      "type": "inspection",
+      "requires_shutdown": false,
+      "downtime_h": 0.5,
+      "cost": 1,
+      "safety_gain": 0.1,
+      "steps": [
+        "Check coolant level, flow and cooler"
+      ]
+    },
+    "adjust_cutting_parameters": {
+      "name": "Adjust torque/speed to keep power within 3.5–9 kW",
+      "type": "operational",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.3,
+      "steps": [
+        "Recalculate feed/speed",
+        "Update the NC program"
+      ]
+    },
+    "check_spindle_drive": {
+      "name": "Inspect spindle drive and power supply",
+      "type": "inspection",
+      "requires_shutdown": true,
+      "downtime_h": 1,
+      "cost": 1,
+      "safety_gain": 0.2,
+      "steps": [
+        "Check drive alarms, supply and spindle load meter"
+      ]
+    },
+    "reduce_cutting_load": {
+      "name": "Reduce cutting torque (feed/depth) for the worn tool",
+      "type": "operational",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.2,
+      "steps": [
+        "Reduce feed/depth of cut",
+        "Plan tool change"
+      ]
+    },
+    "withdraw_train": {
+      "name": "Take the train out of passenger service",
+      "type": "containment",
+      "requires_shutdown": true,
+      "downtime_h": 4,
+      "cost": 3,
+      "safety_gain": 1.0,
+      "steps": [
+        "Inform control centre",
+        "Run empty to the depot",
+        "Do not restart service until pressure holds above 8.2 bar"
+      ]
+    },
+    "leak_test": {
+      "name": "Pressure-decay leak test",
+      "type": "inspection",
+      "requires_shutdown": true,
+      "downtime_h": 1,
+      "cost": 1,
+      "safety_gain": 0.3,
+      "steps": [
+        "Fill to 10 bar and stop the compressor",
+        "Record the pressure drop over 10 minutes",
+        "Use soapy water on joints to find the leak"
+      ]
+    },
+    "repair_air_leak": {
+      "name": "Repair the air leak",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 3,
+      "cost": 2,
+      "safety_gain": 0.6,
+      "steps": [
+        "Isolate and vent the affected section",
+        "Replace the leaking fitting, hose or seal",
+        "Repeat the leak test"
+      ]
+    },
+    "service_dryer_valves": {
+      "name": "Service the air-dryer valves",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 2,
+      "cost": 2,
+      "safety_gain": 0.4,
+      "steps": [
+        "Check tower changeover and drain valves",
+        "Replace worn seals",
+        "Check the dryer purge cycle"
+      ]
+    },
+    "duty_cycle_alarm": {
+      "name": "Alarm on compressor duty cycle",
+      "type": "monitoring",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.2,
+      "steps": [
+        "Alert when the compressor is loaded > 80 % of 30 minutes",
+        "Review the trend every day"
+      ]
+    },
+    "periodic_leak_survey": {
+      "name": "Monthly leak survey",
+      "type": "preventive",
+      "requires_shutdown": false,
+      "downtime_h": 0,
+      "cost": 1,
+      "safety_gain": 0.2,
+      "steps": [
+        "Ultrasonic or soap-test survey of joints every month"
+      ]
+    },
+    "check_oil_cooler": {
+      "name": "Inspect the oil cooler",
+      "type": "inspection",
+      "requires_shutdown": true,
+      "downtime_h": 1,
+      "cost": 1,
+      "safety_gain": 0.2,
+      "steps": [
+        "Clean cooler fins",
+        "Check the fan and the thermostatic valve"
+      ]
+    },
+    "change_compressor_oil": {
+      "name": "Change compressor oil and filter",
+      "type": "corrective",
+      "requires_shutdown": true,
+      "downtime_h": 1.5,
+      "cost": 2,
+      "safety_gain": 0.2,
+      "steps": [
+        "Drain oil",
+        "Replace oil filter",
+        "Refill to the correct level"
+      ]
+    }
+  }
+}
