@@ -1,0 +1,635 @@
+{
+  "meta": {
+    "name": "IEFD-KBS Equipment Ontology (frame-based)",
+    "version": "1.0",
+    "description": "Frame hierarchy for industrial equipment. Each class is a frame with slots; subclasses inherit slots, components, parameters and fault classes from their ancestors (is-a). Assets are instance frames that fill slot values and inherit defaults.",
+    "relations": [
+      "is_a",
+      "has_component",
+      "has_parameter",
+      "instance_of"
+    ]
+  },
+  "classes": {
+    "Equipment": {
+      "parent": null,
+      "abstract": true,
+      "label": "Industrial Equipment",
+      "description": "Root frame for every maintainable asset in the plant.",
+      "slots": {
+        "criticality": {
+          "default": "B",
+          "allowed": [
+            "A",
+            "B",
+            "C"
+          ],
+          "meaning": "A = production/safety critical, B = important, C = non-critical"
+        },
+        "has_standby": {
+          "default": false,
+          "meaning": "A redundant standby unit can take over the duty"
+        },
+        "location": {
+          "default": "Plant"
+        },
+        "production_line": {
+          "default": "General"
+        }
+      },
+      "components": [],
+      "parameters": []
+    },
+    "RotatingMachine": {
+      "parent": "Equipment",
+      "abstract": true,
+      "label": "Rotating Machine",
+      "description": "Any machine with a rotating shaft supported on rolling-element bearings and coupled to a driver/driven machine.",
+      "slots": {
+        "power_kw": {
+          "default": 22
+        },
+        "foundation": {
+          "default": "rigid",
+          "allowed": [
+            "rigid",
+            "flexible"
+          ]
+        },
+        "iso_group": {
+          "default": "auto",
+          "meaning": "ISO 10816-3 machine group; 'auto' = group 1 if power > 300 kW else group 2"
+        }
+      },
+      "components": [
+        "bearings",
+        "shaft",
+        "coupling",
+        "foundation_baseplate"
+      ],
+      "parameters": [
+        "vibration_velocity",
+        "vib_spectrum",
+        "bearing_temp"
+      ]
+    },
+    "CentrifugalPump": {
+      "parent": "RotatingMachine",
+      "abstract": false,
+      "label": "Centrifugal Pump",
+      "description": "Rotodynamic pump transferring liquid by an impeller rotating in a volute casing.",
+      "slots": {
+        "hazardous_fluid": {
+          "default": false,
+          "meaning": "Pumped liquid is flammable/toxic: leaks become a safety issue"
+        },
+        "fluid": {
+          "default": "water"
+        }
+      },
+      "components": [
+        "impeller",
+        "casing_volute",
+        "mechanical_seal",
+        "wear_rings",
+        "suction_line"
+      ],
+      "parameters": [
+        "npsh_available",
+        "npsh_required",
+        "head_pct_rated",
+        "current_pct_normal",
+        "seal_leak_rate"
+      ]
+    },
+    "InductionMotor": {
+      "parent": "RotatingMachine",
+      "abstract": false,
+      "label": "Three-Phase Induction Motor",
+      "description": "Squirrel-cage induction motor (LV, random-wound) driving process equipment.",
+      "slots": {
+        "rated_voltage": {
+          "default": 400
+        },
+        "insulation_class": {
+          "default": "F",
+          "allowed": [
+            "B",
+            "F",
+            "H"
+          ]
+        }
+      },
+      "components": [
+        "stator_winding",
+        "rotor_cage",
+        "cooling_fan",
+        "terminal_box"
+      ],
+      "parameters": [
+        "v_ab",
+        "v_bc",
+        "v_ca",
+        "i_a",
+        "i_b",
+        "i_c",
+        "load_pct_fla",
+        "winding_temp",
+        "sideband_db"
+      ]
+    },
+    "MachineTool": {
+      "parent": "Equipment",
+      "abstract": true,
+      "label": "Machine Tool",
+      "description": "Metal-cutting machine tool.",
+      "slots": {},
+      "components": [
+        "spindle",
+        "spindle_drive",
+        "coolant_system"
+      ],
+      "parameters": []
+    },
+    "CNCMillingMachine": {
+      "parent": "MachineTool",
+      "abstract": false,
+      "label": "CNC Milling Machine",
+      "description": "Milling process monitored with the AI4I 2020 parameter set (air/process temperature, speed, torque, tool wear).",
+      "slots": {
+        "product_variant": {
+          "default": "M",
+          "allowed": [
+            "L",
+            "M",
+            "H"
+          ]
+        }
+      },
+      "components": [
+        "cutting_tool"
+      ],
+      "parameters": [
+        "product_variant",
+        "air_temp_k",
+        "process_temp_k",
+        "rot_speed_rpm",
+        "torque_nm",
+        "tool_wear_min"
+      ]
+    },
+    "AirCompressor": {
+      "parent": "Equipment",
+      "abstract": false,
+      "label": "Train air compressor (APU)",
+      "description": "Air Production Unit of a metro train: an oil-lubricated compressor, an air dryer with two towers and the pneumatic circuit that supplies brakes, suspension and doors (MetroPT-3 signal set).",
+      "slots": {
+        "cut_in_bar": {
+          "default": 8.2,
+          "meaning": "Pressure at which the MPG starts the compressor under load"
+        },
+        "low_pressure_bar": {
+          "default": 7.0,
+          "meaning": "LPS low-pressure alarm level"
+        }
+      },
+      "components": [
+        "compressor_motor",
+        "air_dryer_towers",
+        "pneumatic_circuit",
+        "oil_cooler"
+      ],
+      "parameters": [
+        "duty_pct_30",
+        "current_mean_a_30",
+        "oil_temp_c_max_30",
+        "panel_pressure_min_bar_30",
+        "dryer_dv_pressure_bar_30",
+        "lps_active"
+      ]
+    }
+  },
+  "components": {
+    "bearings": "Rolling-element bearings",
+    "shaft": "Shaft / rotor",
+    "coupling": "Shaft coupling",
+    "foundation_baseplate": "Foundation, baseplate and hold-down bolts",
+    "impeller": "Impeller",
+    "casing_volute": "Casing / volute",
+    "mechanical_seal": "Mechanical seal / stuffing box",
+    "wear_rings": "Wear rings (running clearances)",
+    "suction_line": "Suction line, strainer and valves",
+    "stator_winding": "Stator winding and insulation",
+    "rotor_cage": "Rotor cage (bars and end rings)",
+    "cooling_fan": "Cooling fan and fan cover",
+    "terminal_box": "Terminal box and supply connections",
+    "spindle": "Spindle",
+    "spindle_drive": "Spindle drive and power supply",
+    "coolant_system": "Process cooling",
+    "cutting_tool": "Cutting tool",
+    "compressor_motor": "Compressor and drive motor",
+    "air_dryer_towers": "Air dryer towers and their valves",
+    "pneumatic_circuit": "Pneumatic pipes, fittings and consumers (brakes, doors, suspension)",
+    "oil_cooler": "Oil cooler and oil circuit"
+  },
+  "parameters": {
+    "vibration_velocity": {
+      "label": "Overall vibration velocity (RMS, 10–1000 Hz)",
+      "unit": "mm/s",
+      "type": "number",
+      "group": "Vibration",
+      "min": 0,
+      "max": 50,
+      "step": 0.1
+    },
+    "vib_spectrum": {
+      "label": "Dominant vibration-spectrum feature",
+      "type": "select",
+      "group": "Vibration",
+      "options": [
+        {
+          "value": "",
+          "label": "Not measured / none"
+        },
+        {
+          "value": "spec_1x_radial",
+          "label": "High 1× running speed, radial (not axial)",
+          "domain": [
+            "RotatingMachine"
+          ]
+        },
+        {
+          "value": "spec_2x_axial",
+          "label": "High 1× and 2× with strong axial component",
+          "domain": [
+            "RotatingMachine"
+          ]
+        },
+        {
+          "value": "spec_bearing_freq",
+          "label": "Non-synchronous peaks at bearing defect frequencies",
+          "domain": [
+            "RotatingMachine"
+          ]
+        }
+      ]
+    },
+    "bearing_temp": {
+      "label": "Bearing housing temperature",
+      "unit": "°C",
+      "type": "number",
+      "group": "Thermal",
+      "min": 0,
+      "max": 200,
+      "step": 0.5
+    },
+    "npsh_available": {
+      "label": "NPSH available (NPSHa)",
+      "unit": "m",
+      "type": "number",
+      "group": "Hydraulic",
+      "min": 0,
+      "max": 50,
+      "step": 0.1
+    },
+    "npsh_required": {
+      "label": "NPSH required (NPSH3, from pump curve)",
+      "unit": "m",
+      "type": "number",
+      "group": "Hydraulic",
+      "min": 0,
+      "max": 50,
+      "step": 0.1
+    },
+    "head_pct_rated": {
+      "label": "Developed head as % of curve value at this flow",
+      "unit": "%",
+      "type": "number",
+      "group": "Hydraulic",
+      "min": 0,
+      "max": 150,
+      "step": 1
+    },
+    "current_pct_normal": {
+      "label": "Motor current as % of normal running current",
+      "unit": "%",
+      "type": "number",
+      "group": "Electrical",
+      "min": 0,
+      "max": 200,
+      "step": 1
+    },
+    "seal_leak_rate": {
+      "label": "Seal leakage rate",
+      "unit": "drops/min",
+      "type": "number",
+      "group": "Leakage",
+      "min": 0,
+      "max": 500,
+      "step": 1
+    },
+    "v_ab": {
+      "label": "Line voltage V_AB",
+      "unit": "V",
+      "type": "number",
+      "group": "Electrical",
+      "min": 0,
+      "max": 1000,
+      "step": 1
+    },
+    "v_bc": {
+      "label": "Line voltage V_BC",
+      "unit": "V",
+      "type": "number",
+      "group": "Electrical",
+      "min": 0,
+      "max": 1000,
+      "step": 1
+    },
+    "v_ca": {
+      "label": "Line voltage V_CA",
+      "unit": "V",
+      "type": "number",
+      "group": "Electrical",
+      "min": 0,
+      "max": 1000,
+      "step": 1
+    },
+    "i_a": {
+      "label": "Phase current I_A",
+      "unit": "A",
+      "type": "number",
+      "group": "Electrical",
+      "min": 0,
+      "max": 2000,
+      "step": 0.1
+    },
+    "i_b": {
+      "label": "Phase current I_B",
+      "unit": "A",
+      "type": "number",
+      "group": "Electrical",
+      "min": 0,
+      "max": 2000,
+      "step": 0.1
+    },
+    "i_c": {
+      "label": "Phase current I_C",
+      "unit": "A",
+      "type": "number",
+      "group": "Electrical",
+      "min": 0,
+      "max": 2000,
+      "step": 0.1
+    },
+    "load_pct_fla": {
+      "label": "Average current as % of nameplate FLA",
+      "unit": "%",
+      "type": "number",
+      "group": "Electrical",
+      "min": 0,
+      "max": 300,
+      "step": 1
+    },
+    "winding_temp": {
+      "label": "Stator winding temperature (RTD/thermistor)",
+      "unit": "°C",
+      "type": "number",
+      "group": "Thermal",
+      "min": 0,
+      "max": 250,
+      "step": 1
+    },
+    "sideband_db": {
+      "label": "MCSA (1±2s)f sideband level relative to supply peak",
+      "unit": "dB",
+      "type": "number",
+      "group": "Electrical tests",
+      "min": -90,
+      "max": 0,
+      "step": 0.5
+    },
+    "product_variant": {
+      "label": "Product quality variant",
+      "type": "select",
+      "group": "Process",
+      "options": [
+        {
+          "value": "L",
+          "label": "L (low)",
+          "domain": [
+            "CNCMillingMachine"
+          ]
+        },
+        {
+          "value": "M",
+          "label": "M (medium)",
+          "domain": [
+            "CNCMillingMachine"
+          ]
+        },
+        {
+          "value": "H",
+          "label": "H (high)",
+          "domain": [
+            "CNCMillingMachine"
+          ]
+        }
+      ]
+    },
+    "air_temp_k": {
+      "label": "Air temperature",
+      "unit": "K",
+      "type": "number",
+      "group": "Process",
+      "min": 280,
+      "max": 320,
+      "step": 0.1
+    },
+    "process_temp_k": {
+      "label": "Process temperature",
+      "unit": "K",
+      "type": "number",
+      "group": "Process",
+      "min": 280,
+      "max": 330,
+      "step": 0.1
+    },
+    "rot_speed_rpm": {
+      "label": "Rotational speed",
+      "unit": "rpm",
+      "type": "number",
+      "group": "Process",
+      "min": 0,
+      "max": 3000,
+      "step": 1
+    },
+    "torque_nm": {
+      "label": "Torque",
+      "unit": "Nm",
+      "type": "number",
+      "group": "Process",
+      "min": 0,
+      "max": 100,
+      "step": 0.1
+    },
+    "tool_wear_min": {
+      "label": "Tool wear (cutting time)",
+      "unit": "min",
+      "type": "number",
+      "group": "Process",
+      "min": 0,
+      "max": 300,
+      "step": 1
+    },
+    "duty_pct_30": {
+      "label": "Compressor loaded time, last 30 min",
+      "unit": "%",
+      "type": "number",
+      "group": "Compressor",
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    "current_mean_a_30": {
+      "label": "Average motor current, last 30 min",
+      "unit": "A",
+      "type": "number",
+      "group": "Compressor",
+      "min": 0,
+      "max": 10,
+      "step": 0.1
+    },
+    "oil_temp_c_max_30": {
+      "label": "Highest oil temperature, last 30 min",
+      "unit": "°C",
+      "type": "number",
+      "group": "Compressor",
+      "min": 0,
+      "max": 100,
+      "step": 0.1
+    },
+    "panel_pressure_min_bar_30": {
+      "label": "Lowest pneumatic-panel pressure (TP3), last 30 min",
+      "unit": "bar",
+      "type": "number",
+      "group": "Compressor",
+      "min": 0,
+      "max": 11,
+      "step": 0.01
+    },
+    "dryer_dv_pressure_bar_30": {
+      "label": "Average dryer discharge pressure (DV), last 30 min",
+      "unit": "bar",
+      "type": "number",
+      "group": "Compressor",
+      "min": 0,
+      "max": 10,
+      "step": 0.01
+    },
+    "lps_active": {
+      "label": "Low-pressure alarm (LPS) active",
+      "type": "select",
+      "group": "Compressor",
+      "options": [
+        {
+          "value": "no",
+          "label": "No",
+          "domain": [
+            "AirCompressor"
+          ]
+        },
+        {
+          "value": "yes",
+          "label": "Yes",
+          "domain": [
+            "AirCompressor"
+          ]
+        }
+      ]
+    }
+  },
+  "assets": {
+    "P-101": {
+      "class": "CentrifugalPump",
+      "name": "Cooling-water pump A",
+      "power_kw": 37,
+      "criticality": "A",
+      "has_standby": true,
+      "standby_id": "P-101B",
+      "fluid": "cooling water",
+      "production_line": "Utilities",
+      "location": "Utility house"
+    },
+    "P-205": {
+      "class": "CentrifugalPump",
+      "name": "Solvent transfer pump",
+      "power_kw": 15,
+      "criticality": "A",
+      "has_standby": false,
+      "hazardous_fluid": true,
+      "fluid": "flammable solvent",
+      "production_line": "Coating line",
+      "location": "Solvent tank farm"
+    },
+    "M-120": {
+      "class": "InductionMotor",
+      "name": "Drive motor for P-101 (DOL)",
+      "power_kw": 37,
+      "criticality": "A",
+      "has_standby": true,
+      "insulation_class": "F",
+      "rated_voltage": 400,
+      "production_line": "Utilities",
+      "location": "Utility house"
+    },
+    "M-310": {
+      "class": "InductionMotor",
+      "name": "Main conveyor drive motor (VFD)",
+      "power_kw": 22,
+      "criticality": "B",
+      "has_standby": false,
+      "insulation_class": "F",
+      "rated_voltage": 400,
+      "production_line": "Packaging",
+      "location": "Packaging hall"
+    },
+    "CNC-601": {
+      "class": "CNCMillingMachine",
+      "name": "CNC milling centre",
+      "criticality": "B",
+      "has_standby": false,
+      "product_variant": "M",
+      "production_line": "Machining",
+      "location": "Machine shop"
+    },
+    "GEN-PUMP": {
+      "class": "CentrifugalPump",
+      "name": "Generic centrifugal pump",
+      "generic": true
+    },
+    "GEN-MOTOR": {
+      "class": "InductionMotor",
+      "name": "Generic induction motor",
+      "generic": true
+    },
+    "GEN-CNC": {
+      "class": "CNCMillingMachine",
+      "name": "Generic CNC milling machine",
+      "generic": true
+    },
+    "APU-01": {
+      "class": "AirCompressor",
+      "name": "Metro train air production unit",
+      "criticality": "A",
+      "has_standby": false,
+      "production_line": "Metro fleet",
+      "location": "Train underframe"
+    },
+    "GEN-APU": {
+      "class": "AirCompressor",
+      "name": "Generic train air compressor",
+      "generic": true
+    }
+  }
+}
