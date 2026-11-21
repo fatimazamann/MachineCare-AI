@@ -1,0 +1,773 @@
+{
+  "meta": {
+    "description": "Evidence vocabulary: every fact a rule can test, with the question asked to the user and, for measured facts, the parameters it is derived from.",
+    "kinds": {
+      "observation": "Reported by an operator or technician (sight, sound, touch, smell, gauges).",
+      "context": "Operating or environmental context.",
+      "measurement": "Derived only from sensor or test measurements.",
+      "asset": "Taken from the asset frame (asset register)."
+    }
+  },
+  "facts": {
+    "high_vibration": {
+      "label": "Excessive vibration",
+      "question": "Is the machine vibrating more than normal (felt by hand, visible, or above the usual reading)?",
+      "kind": "observation",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Vibration",
+      "askable": true,
+      "derived_from": [
+        "vibration_velocity"
+      ]
+    },
+    "vibration_severe": {
+      "label": "Vibration in ISO 10816-3 Zone D",
+      "question": "Is vibration in ISO 10816-3 Zone D (level that can cause damage)?",
+      "kind": "measurement",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Vibration",
+      "askable": false,
+      "derived_from": [
+        "vibration_velocity"
+      ]
+    },
+    "high_axial_vibration": {
+      "label": "High axial vibration",
+      "question": "Is axial vibration high (roughly half of radial or more)?",
+      "kind": "observation",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Vibration",
+      "askable": true
+    },
+    "spec_1x_radial": {
+      "label": "Spectrum: high 1× radial",
+      "question": "Does the vibration spectrum show a dominant 1× running-speed peak in the radial direction (not axial)?",
+      "kind": "measurement",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Vibration spectrum",
+      "askable": true,
+      "derived_from": [
+        "vib_spectrum"
+      ]
+    },
+    "spec_2x_axial": {
+      "label": "Spectrum: 1×/2× with strong axial",
+      "question": "Does the spectrum show elevated 1× and 2× peaks with a strong axial component?",
+      "kind": "measurement",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Vibration spectrum",
+      "askable": true,
+      "derived_from": [
+        "vib_spectrum"
+      ]
+    },
+    "spec_bearing_freq": {
+      "label": "Spectrum: bearing defect frequencies",
+      "question": "Does the spectrum show non-synchronous peaks at bearing defect frequencies (BPFO/BPFI/BSF/FTF)?",
+      "kind": "measurement",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Vibration spectrum",
+      "askable": true,
+      "derived_from": [
+        "vib_spectrum"
+      ]
+    },
+    "bearing_noise": {
+      "label": "Bearing rumbling/grinding noise",
+      "question": "Is there a rumbling, grinding or growling noise from a bearing housing?",
+      "kind": "observation",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Acoustic",
+      "askable": true
+    },
+    "bearing_overheating": {
+      "label": "Bearing running hot",
+      "question": "Is a bearing housing abnormally hot?",
+      "kind": "observation",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Thermal",
+      "askable": true,
+      "derived_from": [
+        "bearing_temp"
+      ]
+    },
+    "bearing_temp_critical": {
+      "label": "Bearing temperature at trip level",
+      "question": "Is the bearing temperature at or above the trip level?",
+      "kind": "measurement",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Thermal",
+      "askable": false,
+      "derived_from": [
+        "bearing_temp"
+      ]
+    },
+    "recent_reassembly": {
+      "label": "Recently re-installed / re-coupled",
+      "question": "Was the machine re-installed, re-coupled or realigned in the last ~30 days?",
+      "kind": "context",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Maintenance records",
+      "askable": true
+    },
+    "rotor_deposits": {
+      "label": "Deposits/erosion on rotating parts",
+      "question": "Were deposits, erosion, or missing balance weights seen on the impeller/fan/rotor?",
+      "kind": "observation",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Mechanical",
+      "askable": true
+    },
+    "grease_degraded": {
+      "label": "Grease discoloured/contaminated",
+      "question": "Is the bearing grease dark, hardened, or contaminated?",
+      "kind": "observation",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Lubrication",
+      "askable": true
+    },
+    "relube_overdue": {
+      "label": "Bearing relubrication overdue",
+      "question": "Is bearing relubrication overdue according to the schedule?",
+      "kind": "context",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "group": "Maintenance records",
+      "askable": true
+    },
+    "pipe_strain": {
+      "label": "Pipe strain on casing",
+      "question": "Is suction/discharge piping unsupported or forcing the pump casing (pipe strain)?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Mechanical",
+      "askable": true
+    },
+    "crackling_noise": {
+      "label": "Crackling 'gravel' noise",
+      "question": "Is there a crackling noise, like gravel or marbles passing through the pump?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Acoustic",
+      "askable": true
+    },
+    "low_flow": {
+      "label": "Low delivered flow",
+      "question": "Is the delivered flow lower than required?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Performance",
+      "askable": true
+    },
+    "low_head": {
+      "label": "Low head / discharge pressure",
+      "question": "Is the discharge pressure (head) lower than normal for this flow?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Performance",
+      "askable": true,
+      "derived_from": [
+        "head_pct_rated"
+      ]
+    },
+    "no_flow": {
+      "label": "No liquid delivered",
+      "question": "Is the pump delivering no liquid at all?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Performance",
+      "askable": true
+    },
+    "pressure_fluctuation": {
+      "label": "Fluctuating discharge pressure",
+      "question": "Is the discharge pressure gauge fluctuating or surging?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Performance",
+      "askable": true
+    },
+    "seal_leakage": {
+      "label": "Seal leakage",
+      "question": "Is there visible leakage from the mechanical seal / stuffing box?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Leakage",
+      "askable": true,
+      "derived_from": [
+        "seal_leak_rate"
+      ]
+    },
+    "suction_strainer_blocked": {
+      "label": "Suction strainer blocked",
+      "question": "Is the suction strainer/filter blocked (high ΔP or visibly fouled)?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Hydraulic",
+      "askable": true
+    },
+    "solids_in_fluid": {
+      "label": "Solids in pumped liquid",
+      "question": "Does the pumped liquid contain solids, fibres or abrasive particles?",
+      "kind": "context",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Process",
+      "askable": true
+    },
+    "fluid_temp_high": {
+      "label": "Liquid hotter than design",
+      "question": "Is the liquid temperature above design (closer to its boiling point)?",
+      "kind": "context",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Process",
+      "askable": true
+    },
+    "suction_level_low": {
+      "label": "Low suction level / restricted suction valve",
+      "question": "Is the suction tank/sump level low, or the suction valve partly closed?",
+      "kind": "context",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Hydraulic",
+      "askable": true
+    },
+    "dry_run_event": {
+      "label": "Recent dry-running",
+      "question": "Did the pump run dry recently?",
+      "kind": "context",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Operation",
+      "askable": true
+    },
+    "seal_flush_problem": {
+      "label": "Seal flush/cooling not flowing",
+      "question": "Is the seal flush or cooling line blocked or not flowing?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Leakage",
+      "askable": true
+    },
+    "impeller_long_service": {
+      "label": "Impeller beyond wear life",
+      "question": "Has the impeller/wear-ring set been in service beyond its expected wear life?",
+      "kind": "context",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Maintenance records",
+      "askable": true
+    },
+    "low_power_draw": {
+      "label": "Motor current lower than normal",
+      "question": "Is the pump motor current much lower than normal?",
+      "kind": "observation",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Electrical",
+      "askable": true,
+      "derived_from": [
+        "current_pct_normal"
+      ]
+    },
+    "npsh_margin_low": {
+      "label": "Inadequate NPSH margin",
+      "question": "Is the NPSH margin (NPSHa/NPSH3) inadequate?",
+      "kind": "measurement",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Hydraulic",
+      "askable": false,
+      "derived_from": [
+        "npsh_available",
+        "npsh_required"
+      ]
+    },
+    "hazardous_fluid": {
+      "label": "Hazardous (flammable/toxic) liquid",
+      "question": "Is the pumped liquid flammable or toxic?",
+      "kind": "asset",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "group": "Asset",
+      "askable": true
+    },
+    "motor_overheating": {
+      "label": "Motor overheating",
+      "question": "Is the motor running excessively hot or is a thermal alarm active?",
+      "kind": "observation",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Thermal",
+      "askable": true,
+      "derived_from": [
+        "winding_temp"
+      ]
+    },
+    "winding_temp_critical": {
+      "label": "Winding at/above insulation-class limit",
+      "question": "Is winding temperature at or above the insulation-class limit?",
+      "kind": "measurement",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Thermal",
+      "askable": false,
+      "derived_from": [
+        "winding_temp"
+      ]
+    },
+    "burning_smell": {
+      "label": "Burning smell / smoke",
+      "question": "Is there a burning-insulation smell or smoke from the motor?",
+      "kind": "observation",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Smell/visual",
+      "askable": true
+    },
+    "hums_no_start": {
+      "label": "Hums but will not start",
+      "question": "Does the motor hum but fail to start or accelerate?",
+      "kind": "observation",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Starting",
+      "askable": true
+    },
+    "trips_overload": {
+      "label": "Overload relay/breaker trips",
+      "question": "Does the overload relay or breaker trip?",
+      "kind": "observation",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Electrical",
+      "askable": true
+    },
+    "slow_acceleration": {
+      "label": "Slow acceleration",
+      "question": "Is acceleration slow / starting time longer than normal?",
+      "kind": "observation",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Starting",
+      "askable": true
+    },
+    "current_pulsation": {
+      "label": "Pulsating current",
+      "question": "Does the ammeter needle pulsate/beat rhythmically under load?",
+      "kind": "observation",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Electrical",
+      "askable": true
+    },
+    "speed_low": {
+      "label": "Speed below nameplate",
+      "question": "Is running speed noticeably below nameplate speed?",
+      "kind": "observation",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Performance",
+      "askable": true
+    },
+    "voltage_unbalance": {
+      "label": "Supply voltage unbalance > 1 %",
+      "question": "Is the supply voltage unbalance above 1 % (NEMA MG 1 method)?",
+      "kind": "measurement",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Electrical",
+      "askable": true,
+      "derived_from": [
+        "v_ab",
+        "v_bc",
+        "v_ca"
+      ]
+    },
+    "voltage_unbalance_severe": {
+      "label": "Voltage unbalance ≥ 5 %",
+      "question": "Is voltage unbalance 5 % or more?",
+      "kind": "measurement",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Electrical",
+      "askable": false,
+      "derived_from": [
+        "v_ab",
+        "v_bc",
+        "v_ca"
+      ]
+    },
+    "supply_voltage_low": {
+      "label": "Supply voltage below 90 % of rated",
+      "question": "Is the supply voltage below 90 % of rated?",
+      "kind": "measurement",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Electrical",
+      "askable": true,
+      "derived_from": [
+        "v_ab",
+        "v_bc",
+        "v_ca"
+      ]
+    },
+    "phase_loss": {
+      "label": "One phase missing",
+      "question": "Is one supply phase missing (blown fuse, open contactor pole, loose terminal)?",
+      "kind": "measurement",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Electrical",
+      "askable": true,
+      "derived_from": [
+        "i_a",
+        "i_b",
+        "i_c",
+        "v_ab",
+        "v_bc",
+        "v_ca"
+      ]
+    },
+    "current_unbalance": {
+      "label": "Phase-current unbalance",
+      "question": "Are the three phase currents noticeably unequal (> 10 % deviation)?",
+      "kind": "measurement",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Electrical",
+      "askable": true,
+      "derived_from": [
+        "i_a",
+        "i_b",
+        "i_c"
+      ]
+    },
+    "motor_overloaded": {
+      "label": "Current above nameplate FLA",
+      "question": "Is the motor current above nameplate full-load current?",
+      "kind": "measurement",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Electrical",
+      "askable": true,
+      "derived_from": [
+        "load_pct_fla"
+      ]
+    },
+    "rotor_sidebands": {
+      "label": "MCSA rotor-bar sidebands",
+      "question": "Does current-signature analysis show (1±2s)f sidebands above −45 dB?",
+      "kind": "measurement",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Electrical tests",
+      "askable": true,
+      "derived_from": [
+        "sideband_db"
+      ]
+    },
+    "frequent_starts": {
+      "label": "Frequent starts / duty exceeded",
+      "question": "Is the motor started very frequently or beyond its duty cycle?",
+      "kind": "context",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Operation",
+      "askable": true
+    },
+    "load_jam": {
+      "label": "Driven load jammed / heavier than design",
+      "question": "Is the driven load jammed, binding, or heavier than design?",
+      "kind": "context",
+      "domain": [
+        "InductionMotor"
+      ],
+      "group": "Operation",
+      "askable": true
+    },
+    "low_temp_difference": {
+      "label": "Process–air ΔT < 8.6 K",
+      "question": "Is the process-to-air temperature difference below 8.6 K?",
+      "kind": "measurement",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "group": "Process",
+      "askable": false,
+      "derived_from": [
+        "air_temp_k",
+        "process_temp_k"
+      ]
+    },
+    "low_spindle_speed": {
+      "label": "Speed < 1380 rpm",
+      "question": "Is the rotational speed below 1380 rpm?",
+      "kind": "measurement",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "group": "Process",
+      "askable": false,
+      "derived_from": [
+        "rot_speed_rpm"
+      ]
+    },
+    "power_out_of_range": {
+      "label": "Power outside 3.5–9 kW",
+      "question": "Is mechanical power outside 3500–9000 W?",
+      "kind": "measurement",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "group": "Process",
+      "askable": false,
+      "derived_from": [
+        "torque_nm",
+        "rot_speed_rpm"
+      ]
+    },
+    "power_near_limit": {
+      "label": "Power within 5 % of a limit",
+      "question": "Is mechanical power within 5 % of the 3.5 kW or 9 kW limit?",
+      "kind": "measurement",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "group": "Process",
+      "askable": false,
+      "derived_from": [
+        "torque_nm",
+        "rot_speed_rpm"
+      ]
+    },
+    "overstrain": {
+      "label": "Wear × torque above variant limit",
+      "question": "Is tool wear × torque above the variant limit (11/12/13 kNm·min)?",
+      "kind": "measurement",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "group": "Process",
+      "askable": false,
+      "derived_from": [
+        "tool_wear_min",
+        "torque_nm",
+        "product_variant"
+      ]
+    },
+    "overstrain_approaching": {
+      "label": "Wear × torque ≥ 90 % of limit",
+      "question": "Is tool wear × torque within 10 % of the variant limit?",
+      "kind": "measurement",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "group": "Process",
+      "askable": false,
+      "derived_from": [
+        "tool_wear_min",
+        "torque_nm",
+        "product_variant"
+      ]
+    },
+    "tool_wear_critical": {
+      "label": "Tool wear ≥ 200 min",
+      "question": "Has the tool accumulated 200 min or more of cutting time?",
+      "kind": "measurement",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "group": "Process",
+      "askable": true,
+      "derived_from": [
+        "tool_wear_min"
+      ]
+    },
+    "poor_surface_finish": {
+      "label": "Deteriorating surface finish",
+      "question": "Is the machined surface finish deteriorating (burrs, chatter marks)?",
+      "kind": "observation",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "group": "Quality",
+      "askable": true
+    },
+    "cutting_noise_changed": {
+      "label": "Changed cutting noise / chatter",
+      "question": "Has the cutting noise changed or is there chatter?",
+      "kind": "observation",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "group": "Acoustic",
+      "askable": true
+    },
+    "continuous_loading": {
+      "label": "Compressor loaded almost all the time",
+      "question": "Has the compressor been running loaded for most of the last 30 minutes?",
+      "kind": "measurement",
+      "domain": [
+        "AirCompressor"
+      ],
+      "group": "Compressor",
+      "askable": true,
+      "derived_from": [
+        "duty_pct_30"
+      ]
+    },
+    "high_motor_load": {
+      "label": "High average motor current",
+      "question": "Is the average motor current above 4.5 A (normal is about 2 A)?",
+      "kind": "measurement",
+      "domain": [
+        "AirCompressor"
+      ],
+      "group": "Compressor",
+      "askable": false,
+      "derived_from": [
+        "current_mean_a_30"
+      ]
+    },
+    "oil_temp_high": {
+      "label": "Compressor oil running hot",
+      "question": "Is the compressor oil temperature above 76 °C?",
+      "kind": "measurement",
+      "domain": [
+        "AirCompressor"
+      ],
+      "group": "Thermal",
+      "askable": false,
+      "derived_from": [
+        "oil_temp_c_max_30"
+      ]
+    },
+    "panel_pressure_low": {
+      "label": "Pneumatic panel pressure below cut-in",
+      "question": "Did the panel pressure fall below 8.2 bar?",
+      "kind": "measurement",
+      "domain": [
+        "AirCompressor"
+      ],
+      "group": "Pressure",
+      "askable": false,
+      "derived_from": [
+        "panel_pressure_min_bar_30"
+      ]
+    },
+    "dryer_purge_high": {
+      "label": "High dryer discharge pressure while loaded",
+      "question": "Is the dryer discharge (DV) pressure above 1 bar while the compressor is loaded?",
+      "kind": "measurement",
+      "domain": [
+        "AirCompressor"
+      ],
+      "group": "Pressure",
+      "askable": false,
+      "derived_from": [
+        "dryer_dv_pressure_bar_30"
+      ]
+    },
+    "low_pressure_alarm": {
+      "label": "Low-pressure alarm (LPS) active",
+      "question": "Is the low-pressure alarm (below 7 bar) active?",
+      "kind": "measurement",
+      "domain": [
+        "AirCompressor"
+      ],
+      "group": "Pressure",
+      "askable": true,
+      "derived_from": [
+        "lps_active"
+      ]
+    },
+    "hissing_heard": {
+      "label": "Air hissing heard",
+      "question": "Can you hear air hissing from the pneumatic system?",
+      "kind": "observation",
+      "domain": [
+        "AirCompressor"
+      ],
+      "group": "Sound",
+      "askable": true
+    },
+    "dryer_leak_observed": {
+      "label": "Air escaping at the dryer",
+      "question": "Is air escaping at the dryer towers or their drain valve?",
+      "kind": "observation",
+      "domain": [
+        "AirCompressor"
+      ],
+      "group": "Visual",
+      "askable": true
+    }
+  }
+}
