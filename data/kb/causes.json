@@ -1,0 +1,107 @@
+{
+  "meta": {
+    "description": "Root-cause frames. Cause rules in rules.kb link confirmed faults plus discriminating evidence to these causes; 'prevent' names the preventive action that removes the cause."
+  },
+  "causes": {
+    "deposit_buildup": {
+      "name": "Deposit build-up on the rotor/impeller/fan",
+      "prevent": "clean_rotor"
+    },
+    "improper_alignment": {
+      "name": "Improper alignment after maintenance/installation",
+      "prevent": "laser_alignment"
+    },
+    "pipe_strain": {
+      "name": "Pipe strain distorting the casing",
+      "prevent": "check_pipe_strain"
+    },
+    "inadequate_lubrication": {
+      "name": "Inadequate or contaminated bearing lubrication",
+      "prevent": "lube_schedule"
+    },
+    "fatigue_end_of_life": {
+      "name": "Rolling-contact fatigue at end of life",
+      "prevent": "increase_monitoring"
+    },
+    "low_suction_head": {
+      "name": "Low suction level / restricted suction valve",
+      "prevent": "suction_redesign"
+    },
+    "high_vapour_pressure": {
+      "name": "Liquid too hot (high vapour pressure)",
+      "prevent": "suction_redesign"
+    },
+    "suction_restriction": {
+      "name": "Blocked suction strainer / obstruction",
+      "prevent": "install_strainer"
+    },
+    "solids_ingestion": {
+      "name": "Solids/debris drawn into the pump",
+      "prevent": "install_strainer"
+    },
+    "abrasive_wear": {
+      "name": "Abrasive particles in the liquid",
+      "prevent": "install_strainer"
+    },
+    "normal_wear_out": {
+      "name": "Normal wear-out after long service",
+      "prevent": "increase_monitoring"
+    },
+    "dry_running": {
+      "name": "Dry running of the seal faces",
+      "prevent": "dry_run_protection"
+    },
+    "seal_flush_failure": {
+      "name": "Seal flush/cooling failure",
+      "prevent": "restore_seal_flush"
+    },
+    "supply_unbalance": {
+      "name": "Unbalanced supply (single-phase loads, transformer, loose connections)",
+      "prevent": "phase_protection"
+    },
+    "open_phase": {
+      "name": "Open phase: blown fuse, open contactor pole or loose terminal",
+      "prevent": "phase_protection"
+    },
+    "frequent_starting": {
+      "name": "Frequent / heavy starting (thermal-mechanical stress on cage)",
+      "prevent": "soft_start"
+    },
+    "high_inertia_starting": {
+      "name": "High-inertia or jammed load during starting",
+      "prevent": "soft_start"
+    },
+    "driven_load_binding": {
+      "name": "Binding or jammed driven equipment",
+      "prevent": "reduce_mech_load"
+    },
+    "low_supply_voltage": {
+      "name": "Low supply voltage (higher current for the same load)",
+      "prevent": "correct_supply_balance"
+    },
+    "insufficient_cooling_low_speed": {
+      "name": "Insufficient heat removal at low spindle speed",
+      "prevent": "increase_speed_cooling"
+    },
+    "improper_cutting_parameters": {
+      "name": "Cutting parameters outside the power window",
+      "prevent": "adjust_cutting_parameters"
+    },
+    "worn_tool_high_torque": {
+      "name": "Worn tool under high cutting torque",
+      "prevent": "tool_change_policy"
+    },
+    "tool_beyond_life": {
+      "name": "Tool used beyond its wear life",
+      "prevent": "tool_change_policy"
+    },
+    "dryer_valve_leak": {
+      "name": "Leaking air-dryer tower or drain valve",
+      "prevent": "service_dryer_valves"
+    },
+    "downstream_pipe_leak": {
+      "name": "Leak in pipes, fittings or a consumer downstream of the dryer",
+      "prevent": "periodic_leak_survey"
+    }
+  }
+}
