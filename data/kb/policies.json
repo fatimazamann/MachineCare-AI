@@ -1,0 +1,97 @@
+{
+  "meta": {
+    "description": "Decision knowledge: source reliability, reporting thresholds, urgency rules (risk = severity × CF), stakeholder weight profiles and safety constraints.",
+    "safety_note": "Safety constraints activate at CF ≥ 0.4 (lower than the 0.5 'probable' level for diagnoses) because a missed hazard costs far more than a false stop (precautionary principle).",
+    "default_note": "Slot values inherited as class defaults enter working memory with CF ±0.3 (defeasible), explicit asset-register values with CF ±1.0."
+  },
+  "source_reliability": {
+    "sensor": 0.95,
+    "technician": 0.9,
+    "operator": 0.75,
+    "asset_register": 1.0
+  },
+  "fire_threshold": 0.2,
+  "status_thresholds": {
+    "confirmed": 0.8,
+    "probable": 0.5,
+    "possible": 0.2
+  },
+  "conflict_threshold": 0.3,
+  "ambiguity_margin": 0.15,
+  "urgency": {
+    "urgent_risk": 2.8,
+    "scheduled_risk": 1.5,
+    "non_deferrable_risk": 3.5,
+    "labels": {
+      "IMMEDIATE": "Stop now – safety constraint active",
+      "URGENT": "Act within 24 h",
+      "SCHEDULED": "Next planned stop (≤ 7 days)",
+      "MONITOR": "Monitor / verify"
+    }
+  },
+  "profiles": {
+    "safety_first": {
+      "label": "Safety first (HSE officer)",
+      "weights": {
+        "effectiveness": 0.3,
+        "safety": 0.35,
+        "cost": 0.1,
+        "downtime": 0.1,
+        "production": 0.15
+      },
+      "defer_corrective": false
+    },
+    "balanced": {
+      "label": "Balanced (maintenance manager)",
+      "weights": {
+        "effectiveness": 0.3,
+        "safety": 0.25,
+        "cost": 0.15,
+        "downtime": 0.15,
+        "production": 0.15
+      },
+      "defer_corrective": false
+    },
+    "production_continuity": {
+      "label": "Production continuity (production manager)",
+      "weights": {
+        "effectiveness": 0.25,
+        "safety": 0.2,
+        "cost": 0.1,
+        "downtime": 0.15,
+        "production": 0.3
+      },
+      "defer_corrective": true
+    }
+  },
+  "safety_constraints": {
+    "immediate_stop": {
+      "label": "Immediate stop required",
+      "mandatory_actions": [
+        "stop_loto",
+        "switch_to_standby"
+      ],
+      "blocks_deferral": true
+    },
+    "hazard_containment": {
+      "label": "Hazardous-liquid release – contain and isolate",
+      "mandatory_actions": [
+        "contain_leak",
+        "stop_loto",
+        "switch_to_standby"
+      ],
+      "blocks_deferral": true
+    },
+    "withdraw_from_service": {
+      "label": "Air pressure below 7 bar – take the train out of service",
+      "mandatory_actions": [
+        "withdraw_train"
+      ],
+      "blocks_deferral": true
+    }
+  },
+  "safety_activation_cf": 0.4,
+  "downtime_norm_h": 24,
+  "cost_norm": 5,
+  "default_slot_cf": 0.3
+}
