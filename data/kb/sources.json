@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "description": "Knowledge-source registry. Rules, thresholds and fault frames cite these ids so every piece of knowledge is traceable (knowledge acquisition record)."
+  },
+  "sources": {
+    "S-PSG": {
+      "type": "Maintenance manual / OEM troubleshooting guide",
+      "title": "Centrifugal Pump Troubleshooting Guide (PSG / Griswold)",
+      "year": 2022,
+      "url": "https://psgdover.com/wilden/news/article/2022/05/04/centrifugal-pump-troubleshooting-guide",
+      "used_for": "Pump symptom → cause → remedy pairs"
+    },
+    "S-ECM": {
+      "type": "Expert article (EASA technical support)",
+      "title": "M. Howell, How to Troubleshoot AC Induction Motors Effectively, EC&M",
+      "year": 2022,
+      "url": "https://www.ecmweb.com/maintenance-repair-operations/motors/article/21247047/how-to-troubleshoot-ac-induction-motors-effectively",
+      "used_for": "Motor starting/overheating/vibration/bearing knowledge"
+    },
+    "S-FLUKE": {
+      "type": "Vibration-analysis guide",
+      "title": "Demystifying Vibration Monitoring Part 4: Diagnosing Imbalance, Misalignment, Looseness, and Bearing Wear (Fluke)",
+      "year": null,
+      "url": "https://www.fluke.com/pt-pt/saber-mais/blog/alinhamento/understanding-vibration-monitoring-common-faults-part-4",
+      "used_for": "Spectral signatures of rotating-machine faults"
+    },
+    "S-ISO10816": {
+      "type": "International standard",
+      "title": "ISO 10816-3:2009 Mechanical vibration — Evaluation of machine vibration by measurements on non-rotating parts — Part 3 (now ISO 20816-3:2022)",
+      "year": 2009,
+      "url": "https://www.iso.org",
+      "used_for": "Vibration severity zones A–D"
+    },
+    "S-FAB-ISO": {
+      "type": "Technical summary",
+      "title": "ISO 10816-3 vibration severity zones (Fabrico)",
+      "year": null,
+      "url": "https://www.fabrico.io/blog/iso-10816-3-vibration-severity/",
+      "used_for": "Zone boundary table"
+    },
+    "S-NEMA": {
+      "type": "Industry standard",
+      "title": "NEMA MG 1 Motors and Generators (voltage unbalance, derating)",
+      "year": null,
+      "url": "https://www.nema.org",
+      "used_for": "Voltage-unbalance definition and limits"
+    },
+    "S-PS": {
+      "type": "Technical article",
+      "title": "Unbalanced Voltages and Electric Motors (Pumps & Systems)",
+      "year": null,
+      "url": "https://www.pumpsandsystems.com/unbalanced-voltages-and-electric-motors",
+      "used_for": "NEMA MG 1 unbalance formula, 1 %/5 % limits, 10 °C rule"
+    },
+    "S-FAB-BRB": {
+      "type": "Technical summary",
+      "title": "Broken rotor bar detection – MCSA sideband severity guideline (Fabrico)",
+      "year": null,
+      "url": "https://www.fabrico.io/blog/broken-rotor-bar-detection/",
+      "used_for": "Sideband-level severity bands"
+    },
+    "S-HI961": {
+      "type": "Standard",
+      "title": "ANSI/HI 9.6.1 Rotodynamic Pumps Guideline for NPSH Margin",
+      "year": 2017,
+      "url": "https://www.pumps.org/product/ansi-hi-9-6-1-rotodynamic-pumps-guideline-for-npsh-margin/",
+      "used_for": "NPSH margin concept (NPSHa vs NPSH3)"
+    },
+    "S-AI4I": {
+      "type": "Dataset",
+      "title": "AI4I 2020 Predictive Maintenance Dataset, UCI Machine Learning Repository, doi:10.24432/C5HS5C",
+      "year": 2020,
+      "url": "https://archive.ics.uci.edu/dataset/601",
+      "used_for": "CNC failure-mode definitions and validation data"
+    },
+    "S-MATZKA": {
+      "type": "Research paper",
+      "title": "S. Matzka, Explainable Artificial Intelligence for Predictive Maintenance Applications, AI4I 2020, pp. 69–74",
+      "year": 2020,
+      "url": "https://ieeexplore.ieee.org/abstract/document/9253083",
+      "used_for": "Dataset generation logic"
+    },
+    "S-EXPERT": {
+      "type": "Expert judgement (team as knowledge engineers)",
+      "title": "Certainty factors elicited by the project team from the above sources",
+      "year": 2026,
+      "url": null,
+      "used_for": "Rule CF values, action effectiveness, cost/downtime levels"
+    },
+    "S-METROPT3": {
+      "type": "Dataset",
+      "title": "MetroPT-3 Dataset, UCI Machine Learning Repository (Davari, Veloso, Ribeiro, Gama), doi:10.24432/C5VW3R",
+      "year": 2023,
+      "url": "https://archive.ics.uci.edu/dataset/791",
+      "used_for": "Signal meanings, 8.2 bar cut-in and 7 bar alarm levels, failure reports"
+    },
+    "S-VELOSO2022": {
+      "type": "Research paper",
+      "title": "B. Veloso, R. P. Ribeiro, P. M. Pereira, J. Gama, The MetroPT dataset for predictive maintenance, Scientific Data 9, 764 (2022)",
+      "year": 2022,
+      "url": "https://doi.org/10.1038/s41597-022-01877-3",
+      "used_for": "Air-leak failure behaviour of the APU"
+    },
+    "S-GARCIA2025": {
+      "type": "Research paper",
+      "title": "S. García-Méndez et al., An explainable machine learning framework for railway predictive maintenance using data streams from the metro operator of Portugal, Scientific Reports (2025)",
+      "year": 2025,
+      "url": "https://doi.org/10.1038/s41598-025-08084-1",
+      "used_for": "2-hour pre-failure labelling, window statistics, explanations"
+    },
+    "S-JAKOBS2025": {
+      "type": "Research paper",
+      "title": "M. Jakobs, B. Veloso, J. Gama, Interpretable Rules for Online Failure Prediction: A Case Study on the Metro do Porto dataset (arXiv:2502.07394, 2025)",
+      "year": 2025,
+      "url": "https://arxiv.org/abs/2502.07394",
+      "used_for": "Rule-based explanations of failure alarms"
+    }
+  }
+}
