@@ -1,0 +1,564 @@
+{
+  "meta": {
+    "description": "Fault frames. severity: 1 (minor) … 5 (catastrophic/safety). 'actions' lists candidate maintenance actions with the knowledge engineer's estimate of effectiveness (0–1) and the plan stage. Symptom and cause links are taken from the rule base.",
+    "stages": [
+      "containment",
+      "verify",
+      "corrective",
+      "preventive",
+      "monitor"
+    ]
+  },
+  "faults": {
+    "unbalance": {
+      "name": "Rotor unbalance",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "component": "shaft",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Mass centre of the rotor (impeller/fan/rotor) does not coincide with the axis of rotation, producing a once-per-revolution radial force.",
+      "actions": [
+        {
+          "id": "vibration_analysis",
+          "stage": "verify",
+          "effectiveness": 0.4
+        },
+        {
+          "id": "clean_rotor",
+          "stage": "corrective",
+          "effectiveness": 0.6
+        },
+        {
+          "id": "field_balance",
+          "stage": "corrective",
+          "effectiveness": 0.9
+        },
+        {
+          "id": "increase_monitoring",
+          "stage": "monitor",
+          "effectiveness": 0.2
+        }
+      ],
+      "sources": [
+        "S-FLUKE",
+        "S-ECM"
+      ]
+    },
+    "misalignment": {
+      "name": "Shaft misalignment",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "component": "coupling",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Driver and driven shafts are not collinear (angular/parallel offset), loading bearings, seals and coupling.",
+      "actions": [
+        {
+          "id": "vibration_analysis",
+          "stage": "verify",
+          "effectiveness": 0.4
+        },
+        {
+          "id": "laser_alignment",
+          "stage": "corrective",
+          "effectiveness": 0.9
+        },
+        {
+          "id": "check_pipe_strain",
+          "stage": "corrective",
+          "effectiveness": 0.5
+        },
+        {
+          "id": "fix_soft_foot",
+          "stage": "corrective",
+          "effectiveness": 0.4
+        },
+        {
+          "id": "increase_monitoring",
+          "stage": "monitor",
+          "effectiveness": 0.2
+        }
+      ],
+      "sources": [
+        "S-FLUKE",
+        "S-PSG",
+        "S-ECM"
+      ]
+    },
+    "bearing_defect": {
+      "name": "Rolling-element bearing defect",
+      "domain": [
+        "RotatingMachine"
+      ],
+      "component": "bearings",
+      "severity": 4,
+      "safety_critical": false,
+      "description": "Spalling/pitting of races or rolling elements; progresses to seizure and secondary damage if not corrected.",
+      "actions": [
+        {
+          "id": "vibration_analysis",
+          "stage": "verify",
+          "effectiveness": 0.4
+        },
+        {
+          "id": "replace_bearing",
+          "stage": "corrective",
+          "effectiveness": 0.95
+        },
+        {
+          "id": "relubricate",
+          "stage": "corrective",
+          "effectiveness": 0.2
+        },
+        {
+          "id": "insulated_bearings",
+          "stage": "preventive",
+          "effectiveness": 0.6
+        },
+        {
+          "id": "increase_monitoring",
+          "stage": "monitor",
+          "effectiveness": 0.3
+        }
+      ],
+      "sources": [
+        "S-FLUKE",
+        "S-ECM",
+        "S-PSG"
+      ]
+    },
+    "cavitation": {
+      "name": "Cavitation (insufficient NPSH)",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "component": "impeller",
+      "severity": 4,
+      "safety_critical": false,
+      "description": "Liquid vaporises at the impeller eye because suction pressure falls below vapour pressure; collapsing bubbles erode the impeller and reduce head.",
+      "actions": [
+        {
+          "id": "restore_npsha",
+          "stage": "corrective",
+          "effectiveness": 0.85
+        },
+        {
+          "id": "operate_near_bep",
+          "stage": "corrective",
+          "effectiveness": 0.5
+        },
+        {
+          "id": "inspect_impeller",
+          "stage": "verify",
+          "effectiveness": 0.4
+        },
+        {
+          "id": "suction_redesign",
+          "stage": "preventive",
+          "effectiveness": 0.7
+        }
+      ],
+      "sources": [
+        "S-PSG",
+        "S-HI961"
+      ]
+    },
+    "impeller_blockage": {
+      "name": "Impeller or suction blockage",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "component": "impeller",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Solids or debris partially block the impeller passages or suction, reducing flow and causing hydraulic unbalance.",
+      "actions": [
+        {
+          "id": "clear_impeller",
+          "stage": "corrective",
+          "effectiveness": 0.9
+        },
+        {
+          "id": "install_strainer",
+          "stage": "preventive",
+          "effectiveness": 0.6
+        }
+      ],
+      "sources": [
+        "S-PSG"
+      ]
+    },
+    "impeller_wear": {
+      "name": "Impeller / wear-ring wear (excess clearance)",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "component": "wear_rings",
+      "severity": 2,
+      "safety_critical": false,
+      "description": "Worn impeller or wear rings increase internal recirculation so the pump no longer produces rated head and flow.",
+      "actions": [
+        {
+          "id": "inspect_impeller",
+          "stage": "verify",
+          "effectiveness": 0.4
+        },
+        {
+          "id": "replace_wear_parts",
+          "stage": "corrective",
+          "effectiveness": 0.9
+        },
+        {
+          "id": "increase_monitoring",
+          "stage": "monitor",
+          "effectiveness": 0.2
+        }
+      ],
+      "sources": [
+        "S-PSG"
+      ]
+    },
+    "seal_failure": {
+      "name": "Mechanical seal failure",
+      "domain": [
+        "CentrifugalPump"
+      ],
+      "component": "mechanical_seal",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Worn or damaged seal faces/elastomers allow process liquid to leak along the shaft.",
+      "actions": [
+        {
+          "id": "contain_leak",
+          "stage": "containment",
+          "effectiveness": 0.3
+        },
+        {
+          "id": "replace_mech_seal",
+          "stage": "corrective",
+          "effectiveness": 0.9
+        },
+        {
+          "id": "restore_seal_flush",
+          "stage": "corrective",
+          "effectiveness": 0.5
+        },
+        {
+          "id": "dry_run_protection",
+          "stage": "preventive",
+          "effectiveness": 0.5
+        }
+      ],
+      "sources": [
+        "S-PSG"
+      ]
+    },
+    "voltage_unbalance_fault": {
+      "name": "Supply voltage unbalance",
+      "domain": [
+        "InductionMotor"
+      ],
+      "component": "terminal_box",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Unequal line voltages produce negative-sequence currents; NEMA MG 1 requires derating above 1 % unbalance and advises against operation above 5 %.",
+      "actions": [
+        {
+          "id": "correct_supply_balance",
+          "stage": "corrective",
+          "effectiveness": 0.85
+        },
+        {
+          "id": "reduce_load",
+          "stage": "containment",
+          "effectiveness": 0.3
+        },
+        {
+          "id": "phase_protection",
+          "stage": "preventive",
+          "effectiveness": 0.6
+        }
+      ],
+      "sources": [
+        "S-NEMA",
+        "S-PS"
+      ]
+    },
+    "single_phasing": {
+      "name": "Single phasing (loss of one phase)",
+      "domain": [
+        "InductionMotor"
+      ],
+      "component": "terminal_box",
+      "severity": 5,
+      "safety_critical": true,
+      "description": "One supply phase is open (fuse, contactor pole, terminal). The motor hums without starting or overheats rapidly; windings burn within minutes.",
+      "actions": [
+        {
+          "id": "stop_loto",
+          "stage": "containment",
+          "effectiveness": 0.6
+        },
+        {
+          "id": "repair_open_phase",
+          "stage": "corrective",
+          "effectiveness": 0.9
+        },
+        {
+          "id": "insulation_test",
+          "stage": "verify",
+          "effectiveness": 0.4
+        },
+        {
+          "id": "phase_protection",
+          "stage": "preventive",
+          "effectiveness": 0.7
+        }
+      ],
+      "sources": [
+        "S-ECM"
+      ]
+    },
+    "broken_rotor_bars": {
+      "name": "Broken rotor bars / cracked end ring",
+      "domain": [
+        "InductionMotor"
+      ],
+      "component": "rotor_cage",
+      "severity": 4,
+      "safety_critical": false,
+      "description": "Cracked or broken cage bars cause slip-frequency current pulsation, torque loss and, if fragments lift, stator damage.",
+      "actions": [
+        {
+          "id": "mcsa_confirm",
+          "stage": "verify",
+          "effectiveness": 0.4
+        },
+        {
+          "id": "repair_rotor",
+          "stage": "corrective",
+          "effectiveness": 0.9
+        },
+        {
+          "id": "soft_start",
+          "stage": "preventive",
+          "effectiveness": 0.6
+        },
+        {
+          "id": "increase_monitoring",
+          "stage": "monitor",
+          "effectiveness": 0.2
+        }
+      ],
+      "sources": [
+        "S-FAB-BRB",
+        "S-ECM"
+      ]
+    },
+    "motor_overload": {
+      "name": "Mechanical overload",
+      "domain": [
+        "InductionMotor"
+      ],
+      "component": "stator_winding",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Load torque exceeds rating; current above FLA overheats the winding and reduces insulation life.",
+      "actions": [
+        {
+          "id": "reduce_mech_load",
+          "stage": "corrective",
+          "effectiveness": 0.85
+        },
+        {
+          "id": "reduce_load",
+          "stage": "containment",
+          "effectiveness": 0.4
+        },
+        {
+          "id": "resize_motor",
+          "stage": "preventive",
+          "effectiveness": 0.7
+        }
+      ],
+      "sources": [
+        "S-ECM"
+      ]
+    },
+    "tool_wear_failure": {
+      "name": "Tool wear failure (TWF)",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "component": "cutting_tool",
+      "severity": 2,
+      "safety_critical": false,
+      "description": "The tool fails or must be replaced at a (random) wear time between 200 and 240 min (AI4I 2020 definition).",
+      "actions": [
+        {
+          "id": "replace_tool",
+          "stage": "corrective",
+          "effectiveness": 0.95
+        },
+        {
+          "id": "tool_change_policy",
+          "stage": "preventive",
+          "effectiveness": 0.8
+        }
+      ],
+      "sources": [
+        "S-AI4I",
+        "S-MATZKA"
+      ]
+    },
+    "heat_dissipation_failure": {
+      "name": "Heat dissipation failure (HDF)",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "component": "coolant_system",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Process heat is not removed: air–process temperature difference < 8.6 K together with speed < 1380 rpm (AI4I 2020 definition).",
+      "actions": [
+        {
+          "id": "increase_speed_cooling",
+          "stage": "corrective",
+          "effectiveness": 0.85
+        },
+        {
+          "id": "check_coolant",
+          "stage": "verify",
+          "effectiveness": 0.5
+        }
+      ],
+      "sources": [
+        "S-AI4I",
+        "S-MATZKA"
+      ]
+    },
+    "power_failure": {
+      "name": "Power failure (PWF)",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "component": "spindle_drive",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Mechanical power (torque × angular speed) outside 3500–9000 W, so the process cannot be sustained (AI4I 2020 definition).",
+      "actions": [
+        {
+          "id": "adjust_cutting_parameters",
+          "stage": "corrective",
+          "effectiveness": 0.85
+        },
+        {
+          "id": "check_spindle_drive",
+          "stage": "verify",
+          "effectiveness": 0.5
+        }
+      ],
+      "sources": [
+        "S-AI4I",
+        "S-MATZKA"
+      ]
+    },
+    "overstrain_failure": {
+      "name": "Overstrain failure (OSF)",
+      "domain": [
+        "CNCMillingMachine"
+      ],
+      "component": "cutting_tool",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Tool wear × torque exceeds 11 000 (L), 12 000 (M) or 13 000 (H) min·Nm (AI4I 2020 definition).",
+      "actions": [
+        {
+          "id": "replace_tool",
+          "stage": "corrective",
+          "effectiveness": 0.8
+        },
+        {
+          "id": "reduce_cutting_load",
+          "stage": "corrective",
+          "effectiveness": 0.7
+        },
+        {
+          "id": "tool_change_policy",
+          "stage": "preventive",
+          "effectiveness": 0.6
+        }
+      ],
+      "sources": [
+        "S-AI4I",
+        "S-MATZKA"
+      ]
+    },
+    "air_leak": {
+      "name": "Air leak in the air production unit",
+      "domain": [
+        "AirCompressor"
+      ],
+      "component": "pneumatic_circuit",
+      "severity": 4,
+      "safety_critical": false,
+      "description": "Compressed air escapes, so the compressor must run loaded almost all the time to hold pressure. All four reported MetroPT-3 failures are air leaks; untreated, pressure for brakes and doors can fall below 7 bar.",
+      "actions": [
+        {
+          "id": "leak_test",
+          "stage": "verify",
+          "effectiveness": 0.6
+        },
+        {
+          "id": "repair_air_leak",
+          "stage": "corrective",
+          "effectiveness": 0.9
+        },
+        {
+          "id": "service_dryer_valves",
+          "stage": "corrective",
+          "effectiveness": 0.7
+        },
+        {
+          "id": "duty_cycle_alarm",
+          "stage": "monitor",
+          "effectiveness": 0.5
+        }
+      ],
+      "sources": [
+        "S-METROPT3",
+        "S-VELOSO2022",
+        "S-EXPERT"
+      ]
+    },
+    "compressor_overheating": {
+      "name": "Compressor overheating (oil cooling problem)",
+      "domain": [
+        "AirCompressor"
+      ],
+      "component": "oil_cooler",
+      "severity": 3,
+      "safety_critical": false,
+      "description": "Oil temperature is high although the compressor is not working harder than normal, which points to the oil cooler or oil itself.",
+      "actions": [
+        {
+          "id": "check_oil_cooler",
+          "stage": "verify",
+          "effectiveness": 0.6
+        },
+        {
+          "id": "change_compressor_oil",
+          "stage": "corrective",
+          "effectiveness": 0.7
+        }
+      ],
+      "sources": [
+        "S-METROPT3",
+        "S-EXPERT"
+      ]
+    }
+  }
+}
